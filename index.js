@@ -231,6 +231,10 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
     let path_image2= req.files["image2"]?.[0].path;
     let path_image3= req.files["image3"]?.[0].path;
 
+    console.log(description);
+    
+    console.log(path_image1);
+
 
     schedule.schedule(description,localisation,description_precise,path_image1,path_image2,path_image3,req.user.username);
 
@@ -255,6 +259,6 @@ app.post('/transfert',authMiddleware_special,newmiddleware, (req,res)=>{
 
 
 
-app.listen(3060,'0.0.0.0',()=>{
+app.listen(3065,'0.0.0.0',()=>{
   console.log('Server running');
 });

@@ -9,9 +9,10 @@ dotenv.config();
 async function scraper(description,localisation,description_precise,photo1,photo2,photo3,mail){
 
     const path = `${mail}_issue_.txt`;
-    filemanag.createfile(path);
+    await filemanag.createfile(path);
 
     const options = new chrome.Options();
+    options.setChromeBinaryPath('/usr/bin/google-chrome');
     options.addArguments('--headless');
     options.addArguments("--disable-gpu");
     options.addArguments("--no-sandbox");
@@ -19,15 +20,15 @@ async function scraper(description,localisation,description_precise,photo1,photo
     //let service = new chrome.ServiceBuilder().setPort(46653).build();
     const driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build();
 
-    filemanag.add_to_the_file(path,"-------- Driver initialisé ------------------");
+    await filemanag.add_to_the_file(path,"-------- Driver initialisé ------------------");
 
     description = ia.connect(description);
 
-    filemanag.add_to_the_file(path,"----------- Description IA Ok-----------------");
+    await filemanag.add_to_the_file(path,"----------- Description IA Ok-----------------");
 
-    description_precise = ia.connect(description_precise);
+    description_precise = ia.connect(description + " " +description_precise);
 
-    filemanag.add_to_the_file(path, "--------- Description precise IA OK --------------- ");
+    await filemanag.add_to_the_file(path, "--------- Description precise IA OK --------------- ");
 
     try {
         await driver.get("https://demarches.grenoble.iziici.fr/grc-peps/signaler-dysfonctionnement-sur-espace-public/");
@@ -37,18 +38,18 @@ async function scraper(description,localisation,description_precise,photo1,photo
         let element=driver.findElement(By.id("f132_op_0"));
         driver.executeScript("arguments[0].click();",element);
     
-        filemanag.add_to_the_file(path,"---- Qualification du probleme OK ------");
+        await filemanag.add_to_the_file(path,"---- Qualification du probleme OK ------");
 
         let file_input = driver.findElement(By.id("form_f155")).sendKeys(Key.TAB);
         file_input = driver.findElement(By.id("form_f155")).clear();
         file_input = driver.findElement(By.id("form_f155")).sendKeys(description);
 
-        filemanag.add_to_the_file(path,"------ Dysfonctionnement OK ----------")
+        await filemanag.add_to_the_file(path,"------ Dysfonctionnement OK ----------")
 
         let selection_adresse=driver.findElement(By.xpath("/html/body/div/main/div/div/div[2]/div/div/div/div[3]/form/div[8]/div[2]/label/input"));
         driver.executeScript("arguments[0].click();",selection_adresse);
 
-        filemanag.add_to_the_file(path,"----------- demande de saisi manuel de l'adresse  OK ------")
+        await filemanag.add_to_the_file(path,"----------- demande de saisi manuel de l'adresse  OK ------")
 
         const timeout = 10000;
 
@@ -93,13 +94,13 @@ async function scraper(description,localisation,description_precise,photo1,photo
         await new Promise(resolve => setTimeout(resolve, 500));
         
 
-        filemanag.add_to_the_file(path,"---------- Validation Choix OK -----");
+        await filemanag.add_to_the_file(path,"---------- Validation Choix OK -----");
         
 
         let description_p =await driver.findElement(By.id("form_f177"));
         await description_p.sendKeys(description_precise);
 
-        filemanag.add_to_the_file(path,"---------- Precision OK ---------");
+        await filemanag.add_to_the_file(path,"---------- Precision OK ---------");
 
         if (photo1 != undefined){
 
@@ -108,7 +109,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
             let photo1_= await driver.findElement(By.id("form_f50"));
             await photo1_.sendKeys(photo1);
 
-            filemanag.add_to_the_file(path,"------------Ajout Photo 1 OK ------");
+            await filemanag.add_to_the_file(path,"------------Ajout Photo 1 OK ------");
 
         }
 
@@ -117,7 +118,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
             await new Promise(resolve => setTimeout(resolve, 500));
             let photo2_= await driver.findElement(By.id("form_f52"));
             await photo2_.sendKeys(photo2);
-            filemanag.add_to_the_file(path,"------------Ajout Photo 2 OK ------");
+            await filemanag.add_to_the_file(path,"------------Ajout Photo 2 OK ------");
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
 
@@ -128,7 +129,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
             let photo3_= await driver.findElement(By.id("form_f7d84ab12-8f89-4ac8-ac29-9f81c0a43353"));
             await photo3_.sendKeys(photo3);
 
-            filemanag.add_to_the_file(path,"------------Ajout Photo 3 OK ------");
+            await filemanag.add_to_the_file(path,"------------Ajout Photo 3 OK ------");
 
         }
 
@@ -152,7 +153,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
    
 
-        filemanag.add_to_the_file(path,"------------ Submit OK ------");
+        await filemanag.add_to_the_file(path,"------------ Submit OK ------");
 
         await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -160,7 +161,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
         await driver.executeScript("arguments[0].click();",yes_button);
 
 
-        filemanag.add_to_the_file(path,"------------ Personal Information Button OK------");
+        await filemanag.add_to_the_file(path,"------------ Personal Information Button OK------");
 
 
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -168,7 +169,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
         let email = await driver.findElement(By.id("form_f185"));
         await email.sendKeys(mail);
 
-        filemanag.add_to_the_file(path,"--------- MAIL OK ------- ");
+        await filemanag.add_to_the_file(path,"--------- MAIL OK ------- ");
 
         await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -176,28 +177,28 @@ async function scraper(description,localisation,description_precise,photo1,photo
         await driver.executeScript("arguments[0].click();",checkbox_condition);
 
 
-        filemanag.add_to_the_file(path, "-------- condition checkbox OK -----");
+        await filemanag.add_to_the_file(path, "-------- condition checkbox OK -----");
 
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         let submit2 = await driver.findElement(By.name("submit"));
         await driver.executeScript("arguments[0].click();",submit2);
 
-        filemanag.add_to_the_file(path, "-------- Submit OK  -----");
+        await filemanag.add_to_the_file(path, "-------- Submit OK  -----");
 
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        filemanag.delete_file(path);
+        await filemanag.delete_file(path);
 
         return true;
 
 
 
     } catch(error){
-        filemanag.add_to_the_file(path, `Une erreur a eu lieu \n ${error}`);
-        mailmanag.send_mail(`${mail}_erreur_execution`,"Voici ci-joint le contenu du LOG de l'exécution \n",path,process.env.FROMMAIL);
-        mailmanag.send_mail(`${mail}_erreur_execution`,"Voici ci-joint le contenu du LOG de l'exécution \n",path,mail);
-        filemanag.delete_file(path);
+        await filemanag.add_to_the_file(path, `Une erreur a eu lieu \n ${error}`);
+        await mailmanag.send_mail(`${mail}_erreur_execution`,"Voici ci-joint le contenu du LOG de l'exécution \n",path,process.env.FROMMAIL);
+        await mailmanag.send_mail(`${mail}_erreur_execution`,"Voici ci-joint le contenu du LOG de l'exécution \n",path,mail);
+        await filemanag.delete_file(path);
 
         return false;
 

@@ -14,7 +14,7 @@
   "dependencies": {
     "audit": "^0.0.6",
     "bcrypt": "^6.0.0",
-    "chromedriver": "^141.0.3",
+    "chromedriver": "^131.0.5",
     "cookie-parser": "^1.4.7",
     "crypto": "^1.0.1",
     "dotenv": "^17.2.3",
