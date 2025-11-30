@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <link rel="stylesheet" href ="style.css">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> Essai Formulaire </title>
+    </head>
+    <body>
+        <form action="/upload"  method="post" enctype="multipart/form-data">
+        
+            <label for="descript">Description</label>
+            <input type="text" id="descript" name="descript" placeholder="description de l'infraction"  required>
+    
+            <label for="local">Localisation</label>
+            <input type="text" id="local" name="local" placeholder= "Localisation précise (Attention mettre le numero avant)" required>
+
+            <label for="prec">Description_precise</label>
+            <input type="text" id="prec" name="prec" placeholder= "description précise "required>
+            
+            <label for="im1">Image 1</label>
+            <input type="file" accept="image/*" id="im" name="image1" style="margin: 10px 0;" />
+
+            <label for="im2">Image 2</label>
+            <input type="file" accept="image/*" id="im" name="image2" style="margin: 10px 0;" />
+            
+            <label for="im3">Image 3</label>
+            <input type="file" accept="image/*" id="im" name="image3" style="margin: 10px 0;" />
+
+            <button type="submit">Submit</button>
+        
+        </form>
+    </body>
+</html>
