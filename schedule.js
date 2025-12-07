@@ -27,7 +27,7 @@ async function schedule(description,localisation,description_precise,photo1,phot
             
             status.push(value_status);
             
-            const time = cryptvalo.randomInt(3000,20000);
+            const time = crypto.randomInt(3000,20000);
             
             await new Promise(resolve => setTimeout(resolve, time));
             
