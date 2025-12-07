@@ -55,7 +55,7 @@ var storage = multer.diskStorage({
 const upload = multer({ 
 			storage: storage, 
 			limits: {
-   			 fileSize: 10000000}
+   			 fileSize: 8000000}
 			});
 
 const schedule = require("./schedule.js");
@@ -179,6 +179,7 @@ const authMiddleware = async (req,res,next)=>{
 
     return next();
   } catch (err) {
+    console.log(err);
     return res.redirect("/");
 }
 }
@@ -198,6 +199,7 @@ const authMiddleware_special = async (req,res,next)=>{
     return next();
 
   } catch (err){
+    console.log(err);
     return res.redirect("/");
   }
 }
