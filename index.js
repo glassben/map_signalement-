@@ -55,8 +55,7 @@ var storage = multer.diskStorage({
 const upload = multer({ 
 			storage: storage, 
 			limits: {
-   			 fileSize: 10000000; 
-  			}
+   			 fileSize: 10000000}
 			});
 
 const schedule = require("./schedule.js");
@@ -302,6 +301,6 @@ app.post("/deconnected_bis",authMiddleware_special,newmiddleware,async (req,res)
 
 
 
-app.listen(3096,'0.0.0.0',()=>{
+app.listen(3085,'0.0.0.0',()=>{
   console.log('Server running');
 });
