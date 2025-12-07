@@ -37,11 +37,11 @@ async function test(){
 
     if (list_api.length !=0){
 
-        const index = await crypto.randomInt(0,list_api.length-1);
+        const index = crypto.randomInt(0,list_api.length-1);
 
         console.log("\n")
 
-        await console.log(list_api[index]);
+        console.log(list_api[index]);
 
         await options.addArguments(`--proxy-server=${list_api[0]}`);
         

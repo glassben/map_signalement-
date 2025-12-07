@@ -52,7 +52,12 @@ var storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+			storage: storage, 
+			limits: {
+   			 fileSize: 10000000; 
+  			}
+			});
 
 const schedule = require("./schedule.js");
 
@@ -143,7 +148,7 @@ app.post('/information',newmiddleware, async (req,res)=>{
       maxAge: 30*60*1000,
     });
 
-    new_connex = new connected.connex_table({name:identifiant,name_loc:userIp,nature : "Connexion"});
+    const new_connex = new connected.connex_table({name:identifiant,name_loc:userIp,nature : "Connexion"});
     new_connex.save();
 
     if (userspecial){
