@@ -1,6 +1,6 @@
 const {Builder,By} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 
 
 
@@ -27,7 +27,6 @@ async function change_proxy(driver){
 
 async function test(){
     const options = new chrome.Options();
-    //options.addArguments('--headless');
     options.addArguments("--disable-gpu");
     options.addArguments("--no-sandbox");
 
@@ -56,7 +55,5 @@ async function test(){
     
 
 }
-
-test();
 
 
