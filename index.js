@@ -24,7 +24,7 @@ app.use(cookieParser());
 
 app.use((req,res,next)=>{
   res.set("Content-Security-Policy",
-    "default-src 'self'; script-src 'none'; style-src 'self';");
+    "default-src 'self'; script-src 'self'; style-src 'self';");
   next();
 });
 
@@ -75,7 +75,7 @@ app.get('/', newmiddleware,(req,res) => {
 
 const loginlimiter = rateLimit({
   windowMs: 15*60*1000,
-  max : 5,
+  max : 15,
   message : "Trop d'opérations, veuillez attendre 15 minutes",
   standardHeaders: true,
   legacyHeaders: false,
@@ -85,8 +85,7 @@ app.use(loginlimiter);
 
 
 
-
-app.post('/information', loginlimiter, newmiddleware, async (req,res)=>{
+app.post('/information',newmiddleware, async (req,res)=>{
   try{
     
     let userIp = await requestIp.getClientIp(req);
@@ -135,7 +134,6 @@ app.post('/information', loginlimiter, newmiddleware, async (req,res)=>{
     }
 
  
-
     const token = jwt.sign(payload,process.env.JWT_SECRET, {expiresIn:'30m'});
 
     res.cookie("auth_token",token,{
@@ -145,6 +143,8 @@ app.post('/information', loginlimiter, newmiddleware, async (req,res)=>{
       maxAge: 30*60*1000,
     });
 
+    new_connex = new connected.connex_table({name:identifiant,name_loc:userIp,nature : "Connexion"});
+    new_connex.save();
 
     if (userspecial){
       return res.redirect("/dashboard_special");
@@ -259,6 +259,44 @@ app.post('/transfert',authMiddleware_special,newmiddleware, (req,res)=>{
 
 
 
-app.listen(3065,'0.0.0.0',()=>{
+app.post("/disconnected",authMiddleware,newmiddleware, async (req,res)=>{
+  try{
+    let userIp = await requestIp.getClientIp(req);
+    let user = req.user.username;
+    res.clearCookie("auth_token");
+    mail_manager.send_mail("Deconnexion", " the following user have been deconnected : \n" + `user :${user}` + "\n" +`ip : ${userIp}` + "\n" + `Date : ${new Date()}`,null,process.env.FROMMAIL);
+    const new_deconnex = new connected.connex_table({name : req.user.username, name_loc : userIp, nature: "Deconnection"});
+    new_deconnex.save();
+    return res.redirect("/");
+  } catch (err){
+    console.log(err);
+  }
+});
+
+
+app.post("/deconnected_bis",authMiddleware_special,newmiddleware,async (req,res)=>{
+  try{
+    let userIp = await requestIp.getClientIp(req);
+    let user = req.user.username;
+    res.clearCookie("auth_token");
+    mail_manager.send_mail("Deconnexion", " the following user special have been deconnected : \n" + `user :${user}` + "\n" +`ip : ${userIp}` + "\n" + `Date : ${new Date()}`,null,process.env.FROMMAIL);
+    const new_deconnex = new connected.connex_table({name : req.user.username, name_loc : userIp, nature: "Deconnection"});
+    new_deconnex.save();
+    return res.redirect("/");
+  } catch (err){
+    console.log(err);
+  }
+});
+
+
+
+
+
+
+
+
+
+
+app.listen(3096,'0.0.0.0',()=>{
   console.log('Server running');
 });

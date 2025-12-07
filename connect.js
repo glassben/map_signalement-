@@ -122,4 +122,28 @@ const schema_request = new mongoose.Schema({
 const request_list = mongoose.model('schema_request',schema_request);
 
 
-module.exports = {pupil,id_people,Schema_validation,ip_forbidden, special_people, request_list};
+const connexion_and_deconnexion = new mongoose.Schema({
+    date : {
+        type : Date,
+        default : Date.now,
+        required : true,
+    },
+    name : {
+        type : String,
+        required : true,
+    },
+
+    name_loc : {
+        type : String,
+        required : true,
+    },
+
+    nature : {
+        type : String,
+        required : true,
+    },
+});
+
+const connex_table = mongoose.model('connex_table',connexion_and_deconnexion);
+
+module.exports = {pupil,id_people,Schema_validation,ip_forbidden, special_people, request_list,connex_table};
