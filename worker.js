@@ -12,13 +12,19 @@ async function scraper(description,localisation,description_precise,photo1,photo
     await filemanag.createfile(path);
 
     const options = new chrome.Options();
-    options.setChromeBinaryPath('/usr/bin/google-chrome');
+
+    options.setChromeBinaryPath(process.env.CHROME_BIN);
     options.addArguments('--headless');
     options.addArguments("--disable-gpu");
     options.addArguments("--no-sandbox");
+    options.addArguments('--disable-dev-shm-usage');
+    
     //const driver = new Builder().forBrowser('chrome').setChromeOptions(options).build();
     //let service = new chrome.ServiceBuilder().setPort(46653).build();
-    const driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build();
+    
+    let service = new chrome.ServiceBuilder(process.env.CHROMEDRIVER_PATH);
+    
+    const driver = await new Builder().forBrowser('chrome').setChromeOptions(options).setChromeService(service).build();
 
     await filemanag.add_to_the_file(path,"-------- Driver initialisé ------------------");
 
