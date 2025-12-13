@@ -344,8 +344,8 @@ app.post("/deconnected_bis",authMiddleware_special,newmiddleware,async (req,res)
 
 
 
+const PORT = process.env.PORT || 3000
 
-
-app.listen(3040,'0.0.0.0',()=>{
+app.listen(PORT,()=>{
   console.log('Server running');
 });
