@@ -14,8 +14,6 @@ async function schedule(description,localisation,description_precise,photo1,phot
     const all_pupil = await connection.pupil.find().cursor();
 
     
-
-
     try{
         for (let x = await all_pupil.next();x!=null;x = await all_pupil.next()){
             

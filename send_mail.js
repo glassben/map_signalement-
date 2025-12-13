@@ -10,8 +10,8 @@ async function send_mail(mysubject,mytext,file,mymail){
 
     let transport = await nodemail.createTransport({
         host:'smtp-relay.brevo.com',
-        port:587,
-        secure: false,
+        port:465,
+        secure: true,
         auth:{
             user : process.env.MAIL,
             pass : process.env.PASS,

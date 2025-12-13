@@ -144,6 +144,26 @@ const connexion_and_deconnexion = new mongoose.Schema({
     },
 });
 
+
 const connex_table = mongoose.model('connex_table',connexion_and_deconnexion);
 
-module.exports = {pupil,id_people,Schema_validation,ip_forbidden, special_people, request_list,connex_table};
+
+const count_number_connexion = new mongoose.Schema({
+    ip_ : {
+        type : String,
+        required: true,
+        unique : true,
+    },
+
+    number_ : {
+        type : Number,
+        default : 0,
+        required : true,
+    },
+    
+});
+
+
+const count_number_connexion_table = mongoose.model('number_connexion',count_number_connexion);
+
+module.exports = {pupil,id_people,Schema_validation,ip_forbidden, special_people, request_list,connex_table,count_number_connexion_table};

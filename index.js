@@ -12,7 +12,6 @@ const requestIp = require('request-ip');
 const mail_manager = require("./send_mail.js");
 
 
-
 dotenv.config();
 
 
@@ -42,6 +41,20 @@ app.use(express.static('public'));
 
 //app.enable("trust proxy");
 
+function checkFileType(file,cb){
+  const filetypes=/jpeg|jpg|png/;
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = filetypes.test(file.mimetype);
+
+  if (mimetype && extname){
+    return cb(null,true);
+  } else{
+    cb('Erreur : Seule les images du format (jpeg,jpg,png) sont authorisées !')
+  }
+}
+
+
+
 
 let storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -55,8 +68,12 @@ let storage = multer.diskStorage({
 const upload = multer({ 
 			storage: storage, 
 			limits: {
-   			 fileSize: 8000000}
-			});
+   			 fileSize: 8000000},
+      fileFilter(req,file,cb){
+        checkFileType(file,cb);
+      }
+		});
+
 
 const schedule = require("./schedule.js");
 
@@ -70,9 +87,36 @@ const newmiddleware = async (req,res,next)=>{
   return next();
 }
 
+const initiatemiddleware = async (req,res,next)=>{
+  const userIp = await requestIp.getClientIp(req);
+  const count_associated = await connected.count_number_connexion_table.findOne({ip_ : userIp});
+
+  if (!count_associated){
+    const association = new connected.count_number_connexion_table({ip_ : userIp});
+    association.save();
+    return next();
+  }
+
+  else if (count_associated.number_ >=4){
+
+    const new_ip = new connected.ip_forbidden({ip_list : userIp});
+    new_ip.save();
+    
+    mail_manager.send_mail("ip blocked", ` the following ip ${userIp} was blocked due to too much attempt `,null,process.env.FROMMAIL);
+
+    await connected.count_number_connexion_table.deleteOne(count_associated);
+    return next();
+
+  }else {
+    count_associated.number_+=1;
+    count_associated.save();
+    return next();
+  }
+}
 
 
-app.get('/', newmiddleware,(req,res) => {
+
+app.get('/',newmiddleware,initiatemiddleware,(req,res) => {
     res.sendFile(path.join(__dirname , "/public/Authorization.html"));
 });
 
@@ -85,19 +129,22 @@ const loginlimiter = rateLimit({
   legacyHeaders: false,
 });
 
+
 app.use(loginlimiter);
 
 
 
-app.post('/information',newmiddleware, async (req,res)=>{
+
+
+app.post('/information',newmiddleware,async (req,res)=>{
   try{
     
     let userIp = await requestIp.getClientIp(req);
 
     const {error,value} = connected.Schema_validation.validate(req.body);
     if (error) {
-      mail_manager.send_mail("Access denied", "the following ip try to access to the device without authorization : \n" +` ip : ${userIp}` + "\n" + `Date: ${new Date()}`,null,process.env.FROMMAIL);
-      return res.status(400).json({ message: error.details[0].message });
+      mail_manager.send_mail("Access denied", "the following ip try to access to the device without authorization : \n" +` ip : ${userIp}` + "\n" + `Date: ${new Date()}` + "\n" + `And failed due to the following reason : ${error.details[0].message} `,null,process.env.FROMMAIL);
+      return res.redirect("/");
     }
     
     const {identifiant,mot_de_passe} =  value;
@@ -109,7 +156,7 @@ app.post('/information',newmiddleware, async (req,res)=>{
 
     if ((!user || !(await bcrypt.compare(mot_de_passe,user.code_id))) && !userspecial){
       mail_manager.send_mail("Access denied", "the following ip try to access to the device without authorization : \n" +` ip : ${userIp}` + "\n" + `Date: ${new Date()}`,null,process.env.FROMMAIL);
-      return res.status(401).json({message : 'Invalide'});
+      return res.redirect("/");
     }
 
     
@@ -241,7 +288,6 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
     
     console.log(path_image1);
 
-
     schedule.schedule(description,localisation,description_precise,path_image1,path_image2,path_image3,req.user.username);
 
 
@@ -273,7 +319,8 @@ app.post("/disconnected",authMiddleware,newmiddleware, async (req,res)=>{
     mail_manager.send_mail("Deconnexion", " the following user have been deconnected : \n" + `user :${user}` + "\n" +`ip : ${userIp}` + "\n" + `Date : ${new Date()}`,null,process.env.FROMMAIL);
     const new_deconnex = new connected.connex_table({name : req.user.username, name_loc : userIp, nature: "Deconnection"});
     new_deconnex.save();
-    return res.redirect("/");
+    await connected.count_number_connexion_table.deleteOne({ip_ : userIp});
+    return res.redirect('/');
   } catch (err){
     console.log(err);
   }
@@ -288,7 +335,8 @@ app.post("/deconnected_bis",authMiddleware_special,newmiddleware,async (req,res)
     mail_manager.send_mail("Deconnexion", " the following user special have been deconnected : \n" + `user :${user}` + "\n" +`ip : ${userIp}` + "\n" + `Date : ${new Date()}`,null,process.env.FROMMAIL);
     const new_deconnex = new connected.connex_table({name : req.user.username, name_loc : userIp, nature: "Deconnection"});
     new_deconnex.save();
-    return res.redirect("/");
+    await connected.count_number_connexion_table.deleteOne({ip_:userIp});
+    return res.redirect('/');
   } catch (err){
     console.log(err);
   }
@@ -298,11 +346,6 @@ app.post("/deconnected_bis",authMiddleware_special,newmiddleware,async (req,res)
 
 
 
-
-
-
-
-
-app.listen(3045,'0.0.0.0',()=>{
+app.listen(3040,'0.0.0.0',()=>{
   console.log('Server running');
 });
