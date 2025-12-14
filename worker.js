@@ -22,7 +22,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
     //const driver = new Builder().forBrowser('chrome').setChromeOptions(options).build();
     //let service = new chrome.ServiceBuilder().setPort(46653).build();
     
-    let service = new chrome.ServiceBuilder(process.env.CHROMEDRIVER_PATH);
+    let service = new chrome.ServiceBuilder(process.env.CHROMEDRIVER_PATH).setPort(46653).build();
     
     const driver = await new Builder().forBrowser('chrome').setChromeOptions(options).setChromeService(service).build();
 
@@ -201,6 +201,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
 
     } catch(error){
+        console.log(error);
         await filemanag.add_to_the_file(path, `Une erreur a eu lieu \n ${error}`);
         await mailmanag.send_mail(`${mail}_erreur_execution`,"Voici ci-joint le contenu du LOG de l'exécution \n",path,process.env.FROMMAIL);
         await mailmanag.send_mail(`${mail}_erreur_execution`,"Voici ci-joint le contenu du LOG de l'exécution \n",path,mail);
