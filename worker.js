@@ -29,13 +29,13 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
     await filemanag.add_to_the_file(path_issue,"-------- Driver initialisé ------------------");
 
-    description = ia.connect(description);
+    description = await ia.connect(description);
 
     console.log(`description ia : ${description}`);
 
     await filemanag.add_to_the_file(path_issue,"----------- Description IA Ok-----------------");
 
-    description_precise = ia.connect(description + " " +description_precise);
+    description_precise = await ia.connect(description + " " +description_precise);
 
     console.log(`descriptive precise ia : ${description_precise}`);
 
@@ -183,7 +183,11 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
         console.log(html2);
 
-        await driver.executeScript("arguments[0].click();",submit);
+        await submit.click();
+
+        //await driver.executeScript("arguments[0].click();",submit);
+
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
         await filemanag.add_to_the_file(path_issue,"------------ Submit OK ------");
 
@@ -217,7 +221,9 @@ async function scraper(description,localisation,description_precise,photo1,photo
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         let submit2 = await driver.findElement(By.name("submit"));
-        await driver.executeScript("arguments[0].click();",submit2);
+        //await driver.executeScript("arguments[0].click();",submit2);
+
+        await submit2.click();
 
         console.log("Submit OK");
 
@@ -247,7 +253,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
         
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        await filemanag.delete_file(path);
+        await filemanag.delete_file(path_issue);
 
         return false;
 
