@@ -241,7 +241,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
         
         await driver.executeScript(
             "arguments[0].scrollIntoView({block: 'center'});",
-            submit
+            submit2
         );
 
         await driver.sleep(500);
