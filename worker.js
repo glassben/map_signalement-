@@ -4,6 +4,8 @@ const ia = require("./ia");
 const filemanag = require("./filemanagement");
 const mailmanag = require("./send_mail");
 const dotenv = require('dotenv');
+const fs = require("fs");
+const path = require("path");
 dotenv.config();
 
 async function scraper(description,localisation,description_precise,photo1,photo2,photo3,mail){
@@ -43,12 +45,16 @@ async function scraper(description,localisation,description_precise,photo1,photo
     
         let element=driver.findElement(By.id("f132_op_0"));
         driver.executeScript("arguments[0].click();",element);
+
+        console.log("Qualification du probleme OK");
     
         await filemanag.add_to_the_file(path,"---- Qualification du probleme OK ------");
 
         let file_input = driver.findElement(By.id("form_f155")).sendKeys(Key.TAB);
         file_input = driver.findElement(By.id("form_f155")).clear();
         file_input = driver.findElement(By.id("form_f155")).sendKeys(description);
+
+        console.log("Dysfonctionnement OK");
 
         await filemanag.add_to_the_file(path,"------ Dysfonctionnement OK ----------")
 
@@ -157,11 +163,10 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
         await driver.executeScript("arguments[0].click();",submit);
 
-   
-
         await filemanag.add_to_the_file(path,"------------ Submit OK ------");
 
-        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
         let yes_button = await driver.findElement(By.id("f166_op_0"));
         await driver.executeScript("arguments[0].click();",yes_button);
@@ -202,9 +207,20 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
     } catch(error){
         console.log(error);
+
+        let screenshot = await driver.takeScreenshot();
+
+        
+        fs.writeFileSync(path.join("./ERROR",'screenshot.png'),screenshot,'base64');
+
+        await mailmanag.send_mail('screenshot','here is the screenshot','screenshot.png',process.env.FROMMAIL)
+        
         await filemanag.add_to_the_file(path, `Une erreur a eu lieu \n ${error}`);
         await mailmanag.send_mail(`${mail}_erreur_execution`,"Voici ci-joint le contenu du LOG de l'exécution \n",path,process.env.FROMMAIL);
         await mailmanag.send_mail(`${mail}_erreur_execution`,"Voici ci-joint le contenu du LOG de l'exécution \n",path,mail);
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         await filemanag.delete_file(path);
 
         return false;
