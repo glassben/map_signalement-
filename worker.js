@@ -10,7 +10,7 @@ dotenv.config();
 async function scraper(description,localisation,description_precise,photo1,photo2,photo3,mail){
 
     const path_issue = `${mail}_issue_.txt`;
-    await filemanag.createfile(path);
+    await filemanag.createfile(path_issue);
 
     const options = new chrome.Options();
 
