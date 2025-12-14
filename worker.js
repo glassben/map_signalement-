@@ -174,24 +174,35 @@ async function scraper(description,localisation,description_precise,photo1,photo
         ) */
 
         let submit = await driver.wait(
-            until.elementLocated(By.name("submit"))
-        )
-
-        await new Promise(resolve => setTimeout(resolve, 500));
+            until.elementLocated(By.name("submit")),
+            10000
+        );
         
         const html2 =await submit.getAttribute('outerHTML');
 
         console.log(html2);
 
-        await submit.click();
+        await driver.wait(until.elementIsVisible(submit), 10000);
+        await driver.wait(until.elementIsEnabled(submit), 10000);
 
-        //await driver.executeScript("arguments[0].click();",submit);
+        await driver.executeScript(
+            "arguments[0].scrollIntoView({block: 'center'});",
+            submit
+        );
 
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await driver.sleep(500);
+
+        await driver.executeScript("arguments[0].click();",submit);
+
+        await driver.sleep(500);
 
         await filemanag.add_to_the_file(path_issue,"------------ Submit OK ------");
 
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await driver.sleep(1000);
+
+
+
+
 
         let yes_button = await driver.findElement(By.id("f166_op_0"));
         await driver.executeScript("arguments[0].click();",yes_button);
@@ -220,10 +231,24 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        let submit2 = await driver.findElement(By.name("submit"));
-        //await driver.executeScript("arguments[0].click();",submit2);
+        let submit2 = await driver.wait(
+            until.elementLocated(By.name("submit")),
+            10000
+        );
+        
+        await driver.wait(until.elementIsVisible(submit2), 10000);
+        await driver.wait(until.elementIsEnabled(submit2), 10000);
+        
+        await driver.executeScript(
+            "arguments[0].scrollIntoView({block: 'center'});",
+            submit
+        );
 
-        await submit2.click();
+        await driver.sleep(500);
+
+        await driver.executeScript("arguments[0].click();",submit2);
+
+        await driver.sleep(500);
 
         console.log("Submit OK");
 
@@ -241,14 +266,15 @@ async function scraper(description,localisation,description_precise,photo1,photo
         console.log(error);
 
         let screenshot = await driver.takeScreenshot();
-
         
         fs.writeFileSync("./ERROR/screenshot.png",screenshot,'base64');
 
         await mailmanag.send_mail('screenshot','here is the screenshot','screenshot.png',process.env.FROMMAIL)
         
         await filemanag.add_to_the_file(path_issue, `Une erreur a eu lieu \n ${error}`);
+        
         await mailmanag.send_mail(`${mail}_erreur_execution`,"Voici ci-joint le contenu du LOG de l'exécution \n",path_issue,process.env.FROMMAIL);
+
         await mailmanag.send_mail(`${mail}_erreur_execution`,"Voici ci-joint le contenu du LOG de l'exécution \n",path_issue,mail);
         
         await new Promise(resolve => setTimeout(resolve, 100));
