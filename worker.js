@@ -5,7 +5,6 @@ const filemanag = require("./filemanagement");
 const mailmanag = require("./send_mail");
 const dotenv = require('dotenv');
 const fs = require("fs");
-const path = require("path");
 dotenv.config();
 
 async function scraper(description,localisation,description_precise,photo1,photo2,photo3,mail){
@@ -211,7 +210,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
         let screenshot = await driver.takeScreenshot();
 
         
-        fs.writeFileSync(path.join("./ERROR",'screenshot.png'),screenshot,'base64');
+        fs.writeFileSync("./ERROR/screenshot.png",screenshot,'base64');
 
         await mailmanag.send_mail('screenshot','here is the screenshot','screenshot.png',process.env.FROMMAIL)
         
