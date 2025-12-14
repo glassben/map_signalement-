@@ -22,9 +22,9 @@ async function scraper(description,localisation,description_precise,photo1,photo
     //const driver = new Builder().forBrowser('chrome').setChromeOptions(options).build();
     //let service = new chrome.ServiceBuilder().setPort(46653).build();
     
-    let service = new chrome.ServiceBuilder(process.env.CHROMEDRIVER_PATH).setPort(46653).build();
+    //let service = new chrome.ServiceBuilder(process.env.CHROMEDRIVER_PATH).setPort(46653).build();
     
-    const driver = await new Builder().forBrowser('chrome').setChromeOptions(options).setChromeService(service).build();
+    const driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build();
 
     await filemanag.add_to_the_file(path,"-------- Driver initialisé ------------------");
 
