@@ -34,17 +34,19 @@ app.use((req,res,next)=>{
 
 app.use(express.static('public'));
 
+app.enable("trust proxy");
 
-/*
+
+
 const corsOptions = {
-  origin:'http://localhost:3000', 
+  origin:'https://map-signalement-2015ef4f555e.herokuapp.com/', 
   methods:'GET,POST',
   credential : true,
 }
 
-app.use(cors(corsOptions));*/
+app.use(cors(corsOptions));
 
-//app.enable("trust proxy");
+
 
 // app.use((req,res,next)=>{
 //   if (req.secure || req.headers["x-forwarded-proto"] == "https"){
