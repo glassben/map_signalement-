@@ -2,7 +2,7 @@ const connection = require('./connect.js');
 const scrap = require("./worker.js");
 const crypto = require("crypto");
 const fs = require("fs");
-
+const cloud = require("./cloud.js");
 
 
 
@@ -43,16 +43,40 @@ async function schedule(description,localisation,description_precise,photo1,phot
         return;
     }
 
-    delete_file(photo1,photo2,photo3);
+    potential_url =[]
 
-    const new_request = connection.request_list({initiated: author,location:localisation,accepted:status});
+    if (status.includes(true)){
+        
+        if (photo1){
+            const result_1 = await cloud.upload_cloud(photo1);
+            potential_url.push(result_1);
+        }
+    
+        if (photo2){
+            const result_2 = await cloud.upload_cloud(photo2);
+            potential_url.push(result_2);
+        }
+    
+        if (photo3){
+            const result_3 = await cloud.upload_cloud(photo3);
+            potential_url.push(result_3);
+        }
+    }
+    
+
+
+    const new_request = connection.request_list({initiated: author,location:localisation,accepted:status,url_list : potential_url});
     await new_request.save();
     
+    delete_file(photo1,photo2,photo3);
+
+
     return status;
     
 };
 
 async function delete_file(photo1,photo2,photo3){
+    
     if (photo1!=undefined){
         fs.unlink(photo1, (err) => {
             if (err) console.error('Error deleting file:', err);

@@ -10,14 +10,18 @@ const helmet = require('helmet');
 const cookieParser = require("cookie-parser");
 const requestIp = require('request-ip');
 const mail_manager = require("./send_mail.js");
+const sanitize = require('mongo-sanitize');
+const cors = require("cors");
+const sanitizeHtml = require('sanitize-html')
+
 
 
 dotenv.config();
 
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit : '10kb' }));
+app.use(express.urlencoded({ extended: true, limit : "1mb" }));
 app.use(helmet());
 app.use(cookieParser());
 
@@ -27,9 +31,20 @@ app.use((req,res,next)=>{
   next();
 });
 
-app.use(express.static('public'));
- 
 
+app.use(express.static('public'));
+
+
+/*
+const corsOptions = {
+  origin:'http://localhost:3000', 
+  methods:'GET,POST',
+  credential : true,
+}
+
+app.use(cors(corsOptions));*/
+
+//app.enable("trust proxy");
 
 // app.use((req,res,next)=>{
 //   if (req.secure || req.headers["x-forwarded-proto"] == "https"){
@@ -39,7 +54,6 @@ app.use(express.static('public'));
 // });
 
 
-//app.enable("trust proxy");
 
 function checkFileType(file,cb){
   const filetypes=/jpeg|jpg|png/;
@@ -105,7 +119,7 @@ const initiatemiddleware = async (req,res,next)=>{
     mail_manager.send_mail("ip blocked", ` the following ip ${userIp} was blocked due to too much attempt `,null,process.env.FROMMAIL);
 
     await connected.count_number_connexion_table.deleteOne(count_associated);
-    return next();
+    return res.status(400).json({message : 'Fobidden Access'});
 
   }else {
     count_associated.number_+=1;
@@ -116,7 +130,7 @@ const initiatemiddleware = async (req,res,next)=>{
 
 
 
-app.get('/',newmiddleware,initiatemiddleware,(req,res) => {
+app.get('/',newmiddleware,(req,res) => {
     res.sendFile(path.join(__dirname , "/public/Authorization.html"));
 });
 
@@ -127,6 +141,7 @@ const loginlimiter = rateLimit({
   message : "Trop d'opérations, veuillez attendre 15 minutes",
   standardHeaders: true,
   legacyHeaders: false,
+
 });
 
 
@@ -136,21 +151,30 @@ app.use(loginlimiter);
 
 
 
-app.post('/information',newmiddleware,async (req,res)=>{
+app.post('/information',newmiddleware,initiatemiddleware,async (req,res)=>{
   try{
     
     let userIp = await requestIp.getClientIp(req);
 
+
     const {error,value} = connected.Schema_validation.validate(req.body);
+    
     if (error) {
       mail_manager.send_mail("Access denied", "the following ip try to access to the device without authorization : \n" +` ip : ${userIp}` + "\n" + `Date: ${new Date()}` + "\n" + `And failed due to the following reason : ${error.details[0].message} `,null,process.env.FROMMAIL);
       return res.redirect("/");
     }
-    
-    const {identifiant,mot_de_passe} =  value;
 
-    const user = await connected.id_people.findOne({name_id : identifiant});
-    const userspecial = await connected.special_people.findOne({name_id : identifiant});
+
+    let {identifiant,mot_de_passe} =  value;
+
+    identifiant.replace(" ","").replace("<","").replace(">","");
+
+    identifiant = sanitizeHtml(identifiant);
+
+    mot_de_passe = sanitizeHtml(mot_de_passe);
+
+    const user = await connected.id_people.findOne({name_id : sanitize(identifiant)});
+    const userspecial = await connected.special_people.findOne({name_id : sanitize(identifiant)});
 
     
 
@@ -274,19 +298,19 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
 
     
 
-    const description=req.body.descript;
-    const localisation = req.body.local;
-    const description_precise = req.body.prec;
+    const description=sanitize(sanitizeHtml(req.body.descript));
+    const localisation = sanitize(sanitizeHtml(req.body.local));
+    const description_precise = sanitize(sanitizeHtml(req.body.prec));
 
    
 
-    let path_image1= req.files["image1"]?.[0].path;
-    let path_image2= req.files["image2"]?.[0].path;
-    let path_image3= req.files["image3"]?.[0].path;
+    let path_image1= sanitize(req.files["image1"]?.[0].path);
+    let path_image2= sanitize(req.files["image2"]?.[0].path);
+    let path_image3= sanitize(req.files["image3"]?.[0].path);
 
-    console.log(description);
+    console.log(`description originale : ${description} \n`);
     
-    console.log(path_image1);
+    console.log(`path image : ${path_image1} \n`);
 
     schedule.schedule(description,localisation,description_precise,path_image1,path_image2,path_image3,req.user.username);
 
@@ -344,7 +368,10 @@ app.post("/deconnected_bis",authMiddleware_special,newmiddleware,async (req,res)
 
 
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000;
+
+console.log(PORT);
+
 
 app.listen(PORT,()=>{
   console.log('Server running');
