@@ -13,7 +13,7 @@ const mail_manager = require("./send_mail.js");
 const sanitize = require('mongo-sanitize');
 const cors = require("cors");
 const sanitizeHtml = require('sanitize-html')
-
+const filemanag = require("./filemanagement.js");
 
 
 dotenv.config();
@@ -34,7 +34,7 @@ app.use((req,res,next)=>{
 
 app.use(express.static('public'));
 
-app.enable("trust proxy");
+app.disable('x-powered-by');
 
 
 
@@ -46,7 +46,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-
+app.enable("trust proxy");
 
 // app.use((req,res,next)=>{
 //   if (req.secure || req.headers["x-forwarded-proto"] == "https"){
@@ -92,6 +92,7 @@ const upload = multer({
 
 
 const schedule = require("./schedule.js");
+const { error } = require("console");
 
 
 const newmiddleware = async (req,res,next)=>{
@@ -298,7 +299,7 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
   {name:"image3",maxCount:1}
 ]) , async (req,res)=> {
 
-    
+  try{
 
     const description=sanitize(sanitizeHtml(req.body.descript));
     const localisation = sanitize(sanitizeHtml(req.body.local));
@@ -306,9 +307,13 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
 
    
 
-    let path_image1= sanitize(req.files["image1"]?.[0].path);
-    let path_image2= sanitize(req.files["image2"]?.[0].path);
-    let path_image3= sanitize(req.files["image3"]?.[0].path);
+    let path_image1= req.files["image1"]?.[0];
+    let path_image2= req.files["image2"]?.[0];
+    let path_image3= req.files["image3"]?.[0];
+
+    path_image1 = filemanag.SafeFilePath(path_image1);
+    path_image2 = filemanag.SafeFilePath(path_image2);
+    path_image3 = filemanag.SafeFilePath(path_image3);
 
     console.log(`description originale : ${description} \n`);
     
@@ -316,8 +321,15 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
 
     schedule.schedule(description,localisation,description_precise,path_image1,path_image2,path_image3,req.user.username);
 
-
     return res.redirect("/dashboard");
+
+  }catch (err){
+    console.log(err);
+    mail_manager.send_mail("Issue on the upload directory ", `There was the following issue with the upload directory \n ${err}`,null,process.env.FROMMAIL);
+    return res.redirect("/upload");
+  }
+
+    
 });
 
 

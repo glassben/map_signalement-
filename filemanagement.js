@@ -22,7 +22,7 @@ async function add_to_the_file(file_path,content){
 };
 
 async function delete_file(file_path){
-    await fs.unlink(`./ERROR/${file_path}`, (err)=>{
+    fs.unlinkSync(`./ERROR/${file_path}`, (err)=>{
         if (err){
             console.error("Error deleting file",err);
             return;
@@ -34,5 +34,23 @@ async function getFullPath(file_path){
     return `./ERROR/${file_path}`;
 }
 
-module.exports = {createfile,add_to_the_file,delete_file,getFullPath};
+function SafeFilePath(file){
+    if (!file){
+        return undefined;
+    }
+    const UPLOAD_DIR = path.join(__dirname, 'tmp/');
+
+    let fullpath = path.resolve(UPLOAD_DIR,file.originalname);
+
+    if (!fullpath.startsWith(UPLOAD_DIR)){
+        throw new Error("invalid file path");
+    }
+
+    return fullpath;
+}
+
+
+
+
+module.exports = {createfile,add_to_the_file,delete_file,getFullPath,SafeFilePath};
 

@@ -32,7 +32,6 @@ async function schedule(description,localisation,description_precise,photo1,phot
             console.log("\n");
             console.log("\n");
         }
-        
     } catch (error){
 
         console.log(error);
@@ -44,7 +43,7 @@ async function schedule(description,localisation,description_precise,photo1,phot
         return;
     }
 
-    let potential_url =[]
+    potential_url =[]
 
     if (status.includes(true)){
         
