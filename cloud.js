@@ -12,7 +12,6 @@ cloudinary.config({
 async function upload_cloud(buffer){
     try {
         const result = await cloudinary.uploader.upload(buffer);
-        console.log(result.secure_url);
         return result.secure_url;
     } catch (error){
         console.log(error);
