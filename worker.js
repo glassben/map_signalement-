@@ -4,7 +4,7 @@ const ia = require("./ia");
 const filemanag = require("./filemanagement");
 const mailmanag = require("./send_mail");
 const dotenv = require('dotenv');
-const fs = require("fs");
+const fs = require("node:fs");
 dotenv.config();
 
 async function scraper(description,localisation,description_precise,photo1,photo2,photo3,mail){
@@ -256,7 +256,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        await filemanag.delete_file(path_issue);
+        filemanag.delete_file(path_issue);
 
         return true;
 
@@ -279,7 +279,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
         
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        await filemanag.delete_file(path_issue);
+        filemanag.delete_file(path_issue);
 
         return false;
 
