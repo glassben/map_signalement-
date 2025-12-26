@@ -46,7 +46,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.enable("trust proxy");
+//app.enable("trust proxy");
 
 // app.use((req,res,next)=>{
 //   if (req.secure || req.headers["x-forwarded-proto"] == "https"){

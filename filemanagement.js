@@ -1,9 +1,9 @@
 const fs = require("node:fs");
 const path = require("path");
 
-async function createfile(file_path){
+function createfile(file_path){
     const dateObj = new Date();
-    await fs.writeFile(`./ERROR/${file_path}`,`Date : ${dateObj}  `+ "LOG BEGIN " +"\n","utf8",(err)=>{
+    fs.writeFileSync(`./ERROR/${file_path}`,`Date : ${dateObj}  `+ "LOG BEGIN " +"\n","utf8",(err)=>{
         if (err) {
             console.error("Error writing file: ",err);
             return;
@@ -11,9 +11,9 @@ async function createfile(file_path){
     });
 };
 
-async function add_to_the_file(file_path,content){
+function add_to_the_file(file_path,content){
     const dateObj = new Date();
-    await fs.appendFile(`./ERROR/${file_path}`,`Date : ${dateObj}  `+ content + "\n","utf8",(err)=>{
+    fs.appendFileSync(`./ERROR/${file_path}`,`Date : ${dateObj}  `+ content + "\n","utf8",(err)=>{
         if (err) {
             console.error("Error writing file: ",err);
             return;
@@ -30,11 +30,12 @@ function delete_file(file_path){
     });    
 };
 
-async function getFullPath(file_path){
+function getFullPath(file_path){
     return `./ERROR/${file_path}`;
 }
 
 function SafeFilePath(file){
+    
     if (!file){
         return undefined;
     }
