@@ -21,7 +21,7 @@ async function add_to_the_file(file_path,content){
     });
 };
 
-async function delete_file(file_path){
+function delete_file(file_path){
     fs.unlinkSync(`./ERROR/${file_path}`, (err)=>{
         if (err){
             console.error("Error deleting file",err);

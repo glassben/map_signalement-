@@ -83,6 +83,7 @@ const Schema_validation = Joi.object({
 });
 
 
+
 const schema_ip_forbidden = new mongoose.Schema({
     ip_list : {
         type : String,
@@ -117,6 +118,13 @@ const schema_request = new mongoose.Schema({
             type: Boolean,
         },
     ],
+
+    url_list : [ 
+        {
+            type : String
+        },
+    ],
+
 });
 
 const request_list = mongoose.model('schema_request',schema_request);
@@ -149,6 +157,11 @@ const connex_table = mongoose.model('connex_table',connexion_and_deconnexion);
 
 
 const count_number_connexion = new mongoose.Schema({
+    date: {
+        type: Date,
+        default : Date.now,
+    },
+    
     ip_ : {
         type : String,
         required: true,
@@ -165,5 +178,6 @@ const count_number_connexion = new mongoose.Schema({
 
 
 const count_number_connexion_table = mongoose.model('number_connexion',count_number_connexion);
+
 
 module.exports = {pupil,id_people,Schema_validation,ip_forbidden, special_people, request_list,connex_table,count_number_connexion_table};
