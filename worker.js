@@ -165,10 +165,6 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
         }
 
-       
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
         /* let submit = await driver.wait(
             until.elementLocated(By.xpath("//div[@id='rub_service']/form/div[16]/div[1]/div/button"))
         ) */

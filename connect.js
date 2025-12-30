@@ -44,7 +44,6 @@ const schema_authentification = new mongoose.Schema({
         type : String,
         required : true,
         unique: true,
-        lowercase : true,
     },
 
     code_id :{
@@ -85,11 +84,19 @@ const Schema_validation = Joi.object({
 
 
 const schema_ip_forbidden = new mongoose.Schema({
+    
+    date: {
+        type: Date,
+        default : Date.now,
+        required : true,
+    },
+
     ip_list : {
         type : String,
         required : true,
         unique : true,
     }
+    
 });
 
 const ip_forbidden = mongoose.model('ip_forbidden',schema_ip_forbidden);
@@ -127,7 +134,16 @@ const schema_request = new mongoose.Schema({
 
 });
 
+schema_request.pre('save',function (next){
+    console.log("saving ...");
+    next();
+});
+
+
 const request_list = mongoose.model('schema_request',schema_request);
+
+
+
 
 
 const connexion_and_deconnexion = new mongoose.Schema({

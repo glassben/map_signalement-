@@ -66,9 +66,18 @@ async function schedule(description,localisation,description_precise,photo1,phot
     
 
 
-    const new_request = connection.request_list({initiated: author,location:localisation,accepted:status,url_list : potential_url});
-    await new_request.save();
-    
+    const new_request = new connection.request_list({author,localisation,status,potential_url});
+
+    console.log(`the following new request : ${new_request}`);
+
+    try {
+        await new_request.save();
+    } catch (error){
+        console.log(error);
+    }
+
+    console.log("Save OK");
+
     delete_file(photo1,photo2,photo3);
 
 
@@ -76,24 +85,24 @@ async function schedule(description,localisation,description_precise,photo1,phot
     
 };
 
-async function delete_file(photo1,photo2,photo3){
+function delete_file(photo1,photo2,photo3){
     
     if (photo1!=undefined){
-        fs.unlink(photo1, (err) => {
+        fs.unlinkSync(photo1, (err) => {
             if (err) console.error('Error deleting file:', err);
             else console.log('Temporary file deleted.');
         });
     }
     
     if (photo2!=undefined){
-        fs.unlink(photo2, (err) => {
+        fs.unlinkSync(photo2, (err) => {
             if (err) console.error('Error deleting file:', err);
             else console.log('Temporary file deleted.');
         });
     } 
 
     if (photo3!=undefined){
-        fs.unlink(photo3, (err) => {
+        fs.unlinkSync(photo3, (err) => {
             if (err) console.error('Error deleting file:', err);
             else console.log('Temporary file deleted.');
         });

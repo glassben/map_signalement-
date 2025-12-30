@@ -176,12 +176,12 @@ app.post('/information',newmiddleware,initiatemiddleware,async (req,res)=>{
 
     identifiant.replace(" ","").replace("<","").replace(">","");
 
-    identifiant = sanitizeHtml(identifiant);
+    identifiant = sanitize(sanitizeHtml(identifiant));
 
-    mot_de_passe = sanitizeHtml(mot_de_passe);
+    mot_de_passe = sanitize(sanitizeHtml(mot_de_passe));
 
-    const user = await connected.id_people.findOne({name_id : sanitize(identifiant)});
-    const userspecial = await connected.special_people.findOne({name_id : sanitize(identifiant)});
+    const user = await connected.id_people.findOne({name_id : identifiant}).collation({ locale: 'en', strength: 3 });
+    const userspecial = await connected.special_people.findOne({name_id : identifiant}).collation({ locale: 'en', strength: 3 });
 
     
 
