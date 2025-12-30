@@ -12,6 +12,7 @@
     "node": "20.18.0"
   },
   "dependencies": {
+    "async": "^3.2.6",
     "audit": "^0.0.6",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.8.0",

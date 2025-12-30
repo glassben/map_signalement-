@@ -14,7 +14,7 @@ const sanitize = require('mongo-sanitize');
 const cors = require("cors");
 const sanitizeHtml = require('sanitize-html')
 const filemanag = require("./filemanagement.js");
-
+const scraperQueue = require("./queue.js");
 
 dotenv.config();
 
@@ -45,6 +45,10 @@ const corsOptions = {
 }
 
 app.use(cors(corsOptions));
+
+
+
+
 
 //app.enable("trust proxy");
 
@@ -319,7 +323,11 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
     
     console.log(`path image : ${path_image1} \n`);
 
-    schedule.schedule(description,localisation,description_precise,path_image1,path_image2,path_image3,req.user.username);
+    let username =req.user.username;
+
+    scraperQueue.scraperQueue.push({description,localisation,description_precise,path_image1,path_image2,path_image3,username})
+
+    //schedule.schedule(description,localisation,description_precise,path_image1,path_image2,path_image3,req.user.username);
 
     return res.redirect("/dashboard");
 
