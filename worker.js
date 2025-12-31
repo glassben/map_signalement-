@@ -242,7 +242,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
         await driver.sleep(500);
 
-        //await driver.executeScript("arguments[0].click();",submit2);
+        await driver.executeScript("arguments[0].click();",submit2);
 
         await driver.sleep(500);
 

@@ -323,9 +323,11 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
     
     console.log(`path image : ${path_image1} \n`);
 
-    let username =req.user.username;
+    const username_ = String(req.user.username);
 
-    scraperQueue.scraperQueue.push({description,localisation,description_precise,path_image1,path_image2,path_image3,username})
+    console.log(`the user is ${username_}`);
+
+    scraperQueue.scraperQueue.push({description,localisation,description_precise,path_image1,path_image2,path_image3,username_})
 
     //schedule.schedule(description,localisation,description_precise,path_image1,path_image2,path_image3,req.user.username);
 

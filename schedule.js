@@ -37,8 +37,8 @@ async function schedule(description,localisation,description_precise,photo1,phot
 
         console.log(error);
 
-        const new_request = connection.request_list({initiated: author,location:localisation,accepted:status});
-        await new_request.save();
+        const new_request_error = new connection.request_list({initiated: author,location:localisation,accepted:status});
+        await new_request_error.save();
 
         delete_file(photo1,photo2,photo3);
         return;
@@ -64,19 +64,17 @@ async function schedule(description,localisation,description_precise,photo1,phot
         }
     }
     
+    console.log(`the user is ${author}`);
 
+    const new_request_success = new connection.request_list({initiated: author,location: localisation,accepted: status,url_list: potential_url});
 
-    const new_request = new connection.request_list({author,localisation,status,potential_url});
-
-    console.log(`the following new request : ${new_request}`);
+    console.log(`the following new request : ${new_request_success}`);
 
     try {
-        await new_request.save();
+        await new_request_success.save();
     } catch (error){
         console.log(error);
     }
-
-    console.log("Save OK");
 
     delete_file(photo1,photo2,photo3);
 
