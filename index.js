@@ -475,6 +475,9 @@ app.post('/identification/',middleWarelogincontinue,async (req,res) => {
 
     if (error) {
 
+
+      mail_manager.send_mail("issue with the validation ", `there is the following error ${error} `,null,FROMMAIL);
+      
       return res.redirect(`/identification/`);
 
     }
