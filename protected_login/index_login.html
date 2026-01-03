@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <link rel="stylesheet" href ="style.css">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> Inscription </title>
+    </head>
+    <body>
+        <form action="/identification/"  method="post">
+        
+            <label for="pseudonyme">Pseudonyme (si possible sans lien avec votre identité) </label>
+            <input type="text" id="pseudonyme" name="pseudonyme" placeholder="Doit contenir entre 3 et 30 lettres "  required>
+    
+            <label for="identificator"> Mot de passe (si possible sans lien avec votre date de naissance ou tout autre élément publiquement visible sur Internet) </label>
+            <input type="text" id="identificator" name="identificator" placeholder= "Doit contenir au moins 8 élements et un caractère spécial" required>
+
+            <label for="mail"> Adresse mail (si possible une adresse dédiée en faisant apparaitre le moins possible votre véritable identité)</label>
+            <input type="text" id="mail" name="mail" placeholder= "Votre mail dédié au signalement automatique" required>
+
+            <label for="submit">En appuyant sur Submit vous acceptez que votre adresse mail puisse être utilisée pour le signalement automatique d'anomalies sur la voie publique de Grenoble</label>
+            <button type="submit">Submit</button>
+        
+        </form>
+
+    </body>
+</html>

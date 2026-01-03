@@ -27,12 +27,9 @@ const schema = new mongoose.Schema({
         required : true,
         trim: true,
         unique:true,
-        lowercase:true,
     },
     code :{
         type : String,
-        required : true,
-        unique: true,
         lowercase: true,
     }
 });
@@ -196,4 +193,43 @@ const count_number_connexion = new mongoose.Schema({
 const count_number_connexion_table = mongoose.model('number_connexion',count_number_connexion);
 
 
-module.exports = {pupil,id_people,Schema_validation,ip_forbidden, special_people, request_list,connex_table,count_number_connexion_table};
+const registration_schema = new mongoose.Schema({
+    token : {
+        type : String,
+        required : true,
+        unique : true,
+    },
+
+    Status : {
+        type : String,
+        default : "unconnected",
+        required : true,
+    },
+
+    expireAt : {
+        type : Date,
+        default : new Date(Date.now() + 1800000),
+        required : true,
+    },
+
+    attempt : {
+        type : Number,
+        default : 0,
+        required : true,
+    },
+
+});
+
+const registration = mongoose.model('registration',registration_schema);
+
+
+const Schema_identification = Joi.object({
+    pseudonyme  : Joi.string().alphanum().min(3).max(30).required(),
+    identificator : Joi.string().min(8).max(50).required(),
+    mail : Joi.string().email({tlds: {allow: ['com','net'] }, minDomainSegments: 2}).required(),
+});
+
+
+
+
+module.exports = {pupil,id_people,Schema_validation,ip_forbidden, special_people, request_list,connex_table,count_number_connexion_table,registration, Schema_identification};

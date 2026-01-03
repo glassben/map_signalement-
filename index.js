@@ -15,6 +15,7 @@ const cors = require("cors");
 const sanitizeHtml = require('sanitize-html')
 const filemanag = require("./filemanagement.js");
 const scraperQueue = require("./queue.js");
+const bouncer = require("express-bouncer")(500,90000);
 
 dotenv.config();
 
@@ -69,7 +70,7 @@ function checkFileType(file,cb){
   if (mimetype && extname){
     return cb(null,true);
   } else{
-    cb('Erreur : Seule les images du format (jpeg,jpg,png) sont authorisées !')
+    cb('Erreur : Seules les images du format (jpeg,jpg,png) sont authorisées !')
   }
 }
 
@@ -103,7 +104,7 @@ const newmiddleware = async (req,res,next)=>{
   const userIp = await requestIp.getClientIp(req);
   const forbiddenIp = await connected.ip_forbidden.findOne({ip_list : userIp});
   if (forbiddenIp || userIp == undefined || userIp == null){
-    return res.status(400).json({message : 'Fobidden Access'});
+    return res.status(400).json({message : 'Website not reachable'});
   }
   return next();
 }
@@ -126,7 +127,7 @@ const initiatemiddleware = async (req,res,next)=>{
     mail_manager.send_mail("ip blocked", ` the following ip ${userIp} was blocked due to too much attempt `,null,process.env.FROMMAIL);
 
     await connected.count_number_connexion_table.deleteOne(count_associated);
-    return res.status(400).json({message : 'Fobidden Access'});
+    return res.status(400).json({message : 'Website not reachable'});
 
   }else {
     count_associated.number_+=1;
@@ -155,10 +156,13 @@ const loginlimiter = rateLimit({
 app.use(loginlimiter);
 
 
+bouncer.blocked = function (req,res,next,remaining)
+{
+  res.send("Too many requests, please wait " + remaining/1000 + "seconds");
+}
 
 
-
-app.post('/information',newmiddleware,initiatemiddleware,async (req,res)=>{
+app.post('/information',bouncer.block,newmiddleware,initiatemiddleware,async (req,res)=>{
   try{
     
     let userIp = await requestIp.getClientIp(req);
@@ -229,9 +233,11 @@ app.post('/information',newmiddleware,initiatemiddleware,async (req,res)=>{
     new_connex.save();
 
     if (userspecial){
+      bouncer.reset(req);
       return res.redirect("/dashboard_special");
     }
 
+    bouncer.reset(req);
     return res.redirect("/dashboard");
 
 
@@ -389,6 +395,129 @@ app.post("/deconnected_bis",authMiddleware_special,newmiddleware,async (req,res)
     console.log(err);
   }
 });
+
+
+
+
+const middleWarelogin = async (req,res,next) => {
+    try {
+
+      const token = req.params.token;
+      
+      console.log(`MiddleWarelogin and here is the token : ${token} \n`);
+
+      const possibleregistration = await connected.registration.findOne({token,Status:"unconnected",expireAt : {$gt: new Date()}});
+
+      if (!possibleregistration){
+        return res.status(404).send('Website not reachable');
+      }
+      
+      possibleregistration.Status="connected";
+      possibleregistration.save();
+
+      return next();
+
+    } catch (err){
+      console.log(err);
+    }
+
+}
+
+app.get('/authentification/:token',middleWarelogin,async (req,res) => {
+  const token = req.params.token;
+
+  res.cookie("authentif_token",token,{
+    httpOnly:true,
+    secure:true,
+    sameSite:"strict",
+    maxAge: 30*60*1000,
+  });
+
+  return res.redirect(`/identification/`);
+});
+
+
+const middleWarelogincontinue = async (req,res,next) => {
+  try {
+    const token = req.cookies.authentif_token;
+
+    console.log(`MiddleWareLoginContinue and here is the token : ${token} \n`);
+    
+    const possibleregistration = await connected.registration.findOne({token,Status:"connected",expireAt : {$gt: new Date()}});
+
+    if (!possibleregistration || possibleregistration.attempt >=4){
+      return res.status(404).send("Website not reachable");
+    }
+
+    possibleregistration.attempt+=1;
+    possibleregistration.save();
+
+    return next();
+
+  } catch (err){
+    console.log(err);
+  }
+}
+
+
+
+app.get('/identification/',middleWarelogincontinue,async (req,res) => {
+
+    return res.sendFile(path.join(__dirname,"protected_login","index_login.html"));    
+});
+
+
+
+
+app.use("/identification/",middleWarelogincontinue,express.static('protected_login'));
+
+app.post('/identification/',middleWarelogincontinue,async (req,res) => {
+  try{
+
+    const token_ = req.cookies.authentif_token;
+
+    const {error,value} = connected.Schema_identification.validate(req.body);
+
+    console.log(error);
+
+
+    if (error) {
+
+      return res.redirect(`/identification/`);
+
+    }
+
+    let {pseudonyme,identificator,mail} = value;
+
+    pseudonyme = sanitize(sanitizeHtml(pseudonyme));
+    identificator = sanitize(sanitizeHtml(identificator));
+    mail = sanitize(sanitizeHtml(mail));
+
+    console.log(pseudonyme);
+    console.log(identificator);
+    console.log(mail);
+
+    pseudonyme = String(pseudonyme);
+
+    const newcode = await bcrypt.hash(identificator,10);
+    const newpeople = new connected.id_people({name_id : pseudonyme, code_id : newcode});
+    newpeople.save();
+    
+    const newpupil = new connected.pupil({title : mail});
+    newpupil.save();
+
+    mail_manager.send_mail(" Bienvenue map signalement " , "Vous trouverez ci-dessous les informations pour se connecter à votre compte : \n" + `Identifiant : ${pseudonyme} \n` + `Mot de passe : ${identificator}\n` + `site web : https://map-signalement-2015ef4f555e.herokuapp.com \n` + " Veuillez conserver ces informations de manière personnelle et discrète. Notez que vous pourrez être amené à changer de mot de passe afin de renforcer la sécurité du site ",null,mail); 
+
+    const response = await connected.registration.deleteOne({token : token_});
+
+    return res.send(" L' identification a été complétée avec succès. Veuillez regarder votre mail (en particulier vos spams) afin de pouvoir passer à la suite ");
+
+  } catch (err){
+    console.log(err);
+  }
+})
+
+
 
 
 
