@@ -17,8 +17,6 @@ async function schedule(description,localisation,description_precise,photo1,phot
     try{
         for (let x = await all_pupil.next();x!=null;x = await all_pupil.next()){
             
-            console.log(x);
-            
             let value_status = await scrap.scraper(description,localisation,description_precise,photo1,photo2,photo3,x.title)
             
             console.log(value_status);
@@ -64,11 +62,11 @@ async function schedule(description,localisation,description_precise,photo1,phot
         }
     }
     
-    console.log(`the user is ${author}`);
+    //console.log(`the user is ${author}`);
 
     const new_request_success = new connection.request_list({initiated: author,location: localisation,accepted: status,url_list: potential_url});
 
-    console.log(`the following new request : ${new_request_success}`);
+    //console.log(`the following new request : ${new_request_success}`);
 
     try {
         await new_request_success.save();

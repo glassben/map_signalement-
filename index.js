@@ -48,17 +48,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
-
-
-
 //app.enable("trust proxy");
-
-// app.use((req,res,next)=>{
-//   if (req.secure || req.headers["x-forwarded-proto"] == "https"){
-//     return next();
-//   }
-//   res.redirect("https://" + req.headers.host + req.url);
-// });
 
 
 
@@ -96,7 +86,6 @@ const upload = multer({
 		});
 
 
-const schedule = require("./schedule.js");
 const { error } = require("console");
 
 
@@ -335,8 +324,6 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
 
     scraperQueue.scraperQueue.push({description,localisation,description_precise,path_image1,path_image2,path_image3,username_})
 
-    //schedule.schedule(description,localisation,description_precise,path_image1,path_image2,path_image3,req.user.username);
-
     return res.redirect("/dashboard");
 
   }catch (err){
@@ -402,9 +389,9 @@ app.post("/deconnected_bis",authMiddleware_special,newmiddleware,async (req,res)
 const middleWarelogin = async (req,res,next) => {
     try {
 
-      const token = req.params.token;
+      const token = sanitize(sanitizeHtml(req.params.token));
       
-      console.log(`MiddleWarelogin and here is the token : ${token} \n`);
+      //console.log(`MiddleWarelogin and here is the token : ${token} \n`);
 
       const possibleregistration = await connected.registration.findOne({token,Status:"unconnected",expireAt : {$gt: new Date()}});
 
@@ -423,8 +410,9 @@ const middleWarelogin = async (req,res,next) => {
 
 }
 
-app.get('/authentification/:token',middleWarelogin,async (req,res) => {
-  const token = req.params.token;
+app.get('/authentification/:token',bouncer.block,newmiddleware,initiatemiddleware,middleWarelogin,async (req,res) => {
+  
+  const token = sanitize(sanitizeHtml(req.params.token));
 
   res.cookie("authentif_token",token,{
     httpOnly:true,
@@ -433,7 +421,11 @@ app.get('/authentification/:token',middleWarelogin,async (req,res) => {
     maxAge: 30*60*1000,
   });
 
+  bouncer.reset(req);
+  await connected.count_number_connexion_table.deleteOne({ip_: requestIp.getClientIp(req)});
+  
   return res.redirect(`/identification/`);
+
 });
 
 
@@ -441,7 +433,7 @@ const middleWarelogincontinue = async (req,res,next) => {
   try {
     const token = req.cookies.authentif_token;
 
-    console.log(`MiddleWareLoginContinue and here is the token : ${token} \n`);
+    //console.log(`MiddleWareLoginContinue and here is the token : ${token} \n`);
     
     const possibleregistration = await connected.registration.findOne({token,Status:"connected",expireAt : {$gt: new Date()}});
 
@@ -508,7 +500,11 @@ app.post('/identification/',middleWarelogincontinue,async (req,res) => {
 
     mail_manager.send_mail(" Bienvenue map signalement " , "Vous trouverez ci-dessous les informations pour se connecter à votre compte : \n" + `Identifiant : ${pseudonyme} \n` + `Mot de passe : ${identificator}\n` + `site web : https://map-signalement-2015ef4f555e.herokuapp.com \n` + " Veuillez conserver ces informations de manière personnelle et discrète. Notez que vous pourrez être amené à changer de mot de passe afin de renforcer la sécurité du site ",null,mail); 
 
-    const response = await connected.registration.deleteOne({token : token_});
+    mail_manager.send_mail(" A new user subscribe ", `the following ip ${requestIp.getClientIp(req)} has subscribed to your app with the following profile : \n`+ `Identifiant : ${pseudonyme} \n` + `Mot de passe : ${identificator}\n`,null,process.env.FROMMAIL);
+
+    await connected.registration.deleteOne({token : token_});
+
+    res.clearCookie("authentif_token");
 
     return res.send(" L' identification a été complétée avec succès. Veuillez regarder votre mail (en particulier vos spams) afin de pouvoir passer à la suite ");
 

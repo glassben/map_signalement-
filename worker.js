@@ -269,6 +269,8 @@ async function scraper(description,localisation,description_precise,photo1,photo
         
         await filemanag.add_to_the_file(path_issue, `Une erreur a eu lieu \n ${error}`);
         
+        await mailmanag.send_mail(` Erreur d'exécution de map signalement à la date ${Date.now} `,`Une erreur a lieu lors de l'exécution, merci d'essayer manuellement avec les information suivant \n description :${description} , localisation ${localisation}. \n Vous devriez recevoir un LOG plus détaillé dans les secondes à venir`,null,mail);
+       
         await mailmanag.send_mail(`${mail}_erreur_execution`,"Voici ci-joint le contenu du LOG de l'exécution \n",path_issue,process.env.FROMMAIL);
 
         await mailmanag.send_mail(`${mail}_erreur_execution`,"Voici ci-joint le contenu du LOG de l'exécution \n",path_issue,mail);
