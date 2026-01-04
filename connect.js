@@ -226,7 +226,7 @@ const registration = mongoose.model('registration',registration_schema);
 const Schema_identification = Joi.object({
     pseudonyme  : Joi.string().alphanum().min(3).max(30).required(),
     identificator : Joi.string().min(8).max(50).required(),
-    mail : Joi.string().email({tlds: {allow: ['com','net'] }, minDomainSegments: 2}).required(),
+    mail : Joi.string().email({tlds: {allow: ['com','net','fr','org'] }, minDomainSegments: 2}).required(),
 });
 
 
