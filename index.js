@@ -48,6 +48,18 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
+const allowedOrigins = ['https://map-signalement-2015ef4f555e.herokuapp.com/']
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin || req.headers.referer;
+  console.log(origin);
+  if (!origin || allowedOrigins.includes(origin)) {
+      return next();
+  }
+  res.status(403).send('CSRF attack detected!');
+});
+
+
 //app.enable("trust proxy");
 
 
@@ -99,7 +111,7 @@ const newmiddleware = async (req,res,next)=>{
 }
 
 const initiatemiddleware = async (req,res,next)=>{
-  const userIp = await requestIp.getClientIp(req);
+  const userIp = requestIp.getClientIp(req);
   const count_associated = await connected.count_number_connexion_table.findOne({ip_ : userIp});
 
   if (!count_associated){
@@ -113,7 +125,7 @@ const initiatemiddleware = async (req,res,next)=>{
     const new_ip = new connected.ip_forbidden({ip_list : userIp});
     new_ip.save();
     
-    mail_manager.send_mail("ip blocked", ` the following ip ${userIp} was blocked due to too much attempt `,null,process.env.FROMMAIL);
+    await mail_manager.send_mail("ip blocked", ` the following ip ${userIp} was blocked due to too much attempt `,null,process.env.FROMMAIL);
 
     await connected.count_number_connexion_table.deleteOne(count_associated);
     return res.status(400).json({message : 'Website not reachable'});
@@ -124,7 +136,6 @@ const initiatemiddleware = async (req,res,next)=>{
     return next();
   }
 }
-
 
 
 app.get('/',newmiddleware,(req,res) => {
@@ -154,7 +165,7 @@ bouncer.blocked = function (req,res,next,remaining)
 app.post('/information',bouncer.block,newmiddleware,initiatemiddleware,async (req,res)=>{
   try{
     
-    let userIp = await requestIp.getClientIp(req);
+    let userIp = requestIp.getClientIp(req);
 
 
     const {error,value} = connected.Schema_validation.validate(req.body);
@@ -186,10 +197,10 @@ app.post('/information',bouncer.block,newmiddleware,initiatemiddleware,async (re
     
    
     if (userspecial){
-      mail_manager.send_mail("Access ", " the following user have accessed to the device : \n" + `user :${userspecial.name_id}` + "\n" +`ip : ${userIp}` + "\n" + `Date : ${new Date()}`,null,process.env.FROMMAIL);
+      await mail_manager.send_mail("Access ", " the following user have accessed to the device : \n" + `user :${userspecial.name_id}` + "\n" +`ip : ${userIp}` + "\n" + `Date : ${new Date()}`,null,process.env.FROMMAIL);
 
     }else{
-      mail_manager.send_mail("Access ", " the following user have accessed to the device : \n" + `user :${user.name_id}` + "\n" +`ip : ${userIp}` + "\n" + `Date : ${new Date()}`,null,process.env.FROMMAIL);
+      await mail_manager.send_mail("Access ", " the following user have accessed to the device : \n" + `user :${user.name_id}` + "\n" +`ip : ${userIp}` + "\n" + `Date : ${new Date()}`,null,process.env.FROMMAIL);
     }
    
    
@@ -282,12 +293,12 @@ app.use('/upload',authMiddleware,newmiddleware,express.static('protected'));
 
 
 
-app.get("/dashboard", authMiddleware, newmiddleware, (req, res) => {
+app.get("/dashboard", authMiddleware, newmiddleware,(req, res) => {
   return res.sendFile(path.join(__dirname,"protected","index2.html"));
 });
 
 
-app.get("/dashboard_special", authMiddleware_special, newmiddleware, (req,res) =>{
+app.get("/dashboard_special", authMiddleware_special, newmiddleware,(req,res) =>{
   return res.sendFile(path.join(__dirname,"protected_bis","index3.html"));
 });
 
@@ -320,7 +331,7 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
 
     const username_ = String(req.user.username);
 
-    console.log(`the user is ${username_}`);
+    //console.log(`the user is ${username_}`);
 
     scraperQueue.scraperQueue.push({description,localisation,description_precise,path_image1,path_image2,path_image3,username_})
 
@@ -338,7 +349,7 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
 
 
 
-app.post('/transfert',authMiddleware_special,newmiddleware, (req,res)=>{
+app.post('/transfert',authMiddleware_special,newmiddleware,(req,res)=>{
   const {deleting} = req.body;
 
   try{
@@ -352,7 +363,7 @@ app.post('/transfert',authMiddleware_special,newmiddleware, (req,res)=>{
 
 
 
-app.post("/disconnected",authMiddleware,newmiddleware, async (req,res)=>{
+app.post("/disconnected",authMiddleware,newmiddleware,async (req,res)=>{
   try{
     let userIp = await requestIp.getClientIp(req);
     let user = req.user.username;
@@ -476,7 +487,7 @@ app.post('/identification/',middleWarelogincontinue,async (req,res) => {
     if (error) {
 
 
-      mail_manager.send_mail("issue with the validation ", `there is the following error ${error} `,null,FROMMAIL);
+      await mail_manager.send_mail("issue with the validation ", `there is the following error ${error} `,null,FROMMAIL);
       
       return res.redirect(`/identification/`);
 
@@ -501,9 +512,9 @@ app.post('/identification/',middleWarelogincontinue,async (req,res) => {
     const newpupil = new connected.pupil({title : mail});
     newpupil.save();
 
-    mail_manager.send_mail(" Bienvenue map signalement " , "Vous trouverez ci-dessous les informations pour se connecter à votre compte : \n" + `Identifiant : ${pseudonyme} \n` + `Mot de passe : ${identificator}\n` + `site web : https://map-signalement-2015ef4f555e.herokuapp.com \n` + " Veuillez conserver ces informations de manière personnelle et discrète. Notez que vous pourrez être amené à changer de mot de passe afin de renforcer la sécurité du site ",null,mail); 
+    await mail_manager.send_mail(" Bienvenue map signalement " , "Vous trouverez ci-dessous les informations pour se connecter à votre compte : \n" + `Identifiant : ${pseudonyme} \n` + `Mot de passe : ${identificator}\n` + `site web : https://map-signalement-2015ef4f555e.herokuapp.com \n` + " Veuillez conserver ces informations de manière personnelle et discrète. Notez que vous pourrez être amené à changer de mot de passe afin de renforcer la sécurité du site ",null,mail); 
 
-    mail_manager.send_mail(" A new user subscribe ", `the following ip ${requestIp.getClientIp(req)} has subscribed to your app with the following profile : \n`+ `Identifiant : ${pseudonyme} \n` + `Mot de passe : ${identificator}\n`,null,process.env.FROMMAIL);
+    await mail_manager.send_mail(" A new user subscribe ", `the following ip ${requestIp.getClientIp(req)} has subscribed to your app with the following profile : \n`+ `Identifiant : ${pseudonyme} \n` + `Mot de passe : ${identificator}\n`,null,process.env.FROMMAIL);
 
     await connected.registration.deleteOne({token : token_});
 
