@@ -430,7 +430,7 @@ app.get('/authentification/:token',bouncer.block,newmiddleware,initiatemiddlewar
 
 const middleWarelogincontinue = async (req,res,next) => {
   try {
-    const token_ = req.cookies.authentif_token;
+    const token_ = sanitize(sanitizeHtml(req.cookies.authentif_token));
 
     //console.log(`MiddleWareLoginContinue and here is the token : ${token} \n`);
     
