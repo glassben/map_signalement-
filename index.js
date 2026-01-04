@@ -16,6 +16,8 @@ const sanitizeHtml = require('sanitize-html')
 const filemanag = require("./filemanagement.js");
 const scraperQueue = require("./queue.js");
 const bouncer = require("express-bouncer")(500,90000);
+const validator = require('validator');
+
 
 dotenv.config();
 
