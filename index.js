@@ -48,18 +48,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
-const allowedOrigins = ['https://map-signalement-2015ef4f555e.herokuapp.com/']
-
-app.use((req, res, next) => {
-  const origin = req.headers.origin || req.headers.referer;
-  console.log(origin);
-  if (!origin || allowedOrigins.includes(origin)) {
-      return next();
-  }
-  res.status(403).send('CSRF attack detected!');
-});
-
-
 //app.enable("trust proxy");
 
 
@@ -400,11 +388,11 @@ app.post("/deconnected_bis",authMiddleware_special,newmiddleware,async (req,res)
 const middleWarelogin = async (req,res,next) => {
     try {
 
-      const token = sanitize(sanitizeHtml(req.params.token));
+      const token_ = sanitize(sanitizeHtml(req.params.token));
       
       //console.log(`MiddleWarelogin and here is the token : ${token} \n`);
 
-      const possibleregistration = await connected.registration.findOne({token,Status:"unconnected",expireAt : {$gt: new Date()}});
+      const possibleregistration = await connected.registration.findOne({token:token_,Status:"unconnected",expireAt : {$gt: new Date()}});
 
       if (!possibleregistration){
         return res.status(404).send('Website not reachable');
@@ -442,11 +430,11 @@ app.get('/authentification/:token',bouncer.block,newmiddleware,initiatemiddlewar
 
 const middleWarelogincontinue = async (req,res,next) => {
   try {
-    const token = req.cookies.authentif_token;
+    const token_ = req.cookies.authentif_token;
 
     //console.log(`MiddleWareLoginContinue and here is the token : ${token} \n`);
     
-    const possibleregistration = await connected.registration.findOne({token,Status:"connected",expireAt : {$gt: new Date()}});
+    const possibleregistration = await connected.registration.findOne({token:token_,Status:"connected",expireAt : {$gt: new Date()}});
 
     if (!possibleregistration || possibleregistration.attempt >=4){
       return res.status(404).send("Website not reachable");
@@ -477,7 +465,7 @@ app.use("/identification/",middleWarelogincontinue,express.static('protected_log
 app.post('/identification/',middleWarelogincontinue,async (req,res) => {
   try{
 
-    const token_ = req.cookies.authentif_token;
+    const token_ = sanitize(sanitizeHtml(req.cookies.authentif_token));
 
     const {error,value} = connected.Schema_identification.validate(req.body);
 
