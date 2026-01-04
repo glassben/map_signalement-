@@ -192,7 +192,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
         await driver.sleep(500);
 
-        await filemanag.add_to_the_file(path_issue,"------------ Submit OK ------");
+        filemanag.add_to_the_file(path_issue,"------------ Submit OK ------");
 
         await driver.sleep(1000);
 
@@ -205,7 +205,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
         console.log("Personal Information Button OK");
 
-        await filemanag.add_to_the_file(path_issue,"------------ Personal Information Button OK ------");
+        filemanag.add_to_the_file(path_issue,"------------ Personal Information Button OK ------");
 
         await new Promise(resolve => setTimeout(resolve, 1000));
 
