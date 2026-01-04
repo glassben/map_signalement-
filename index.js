@@ -301,9 +301,9 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
 
   try{
 
-    const description=sanitize(sanitizeHtml(req.body.descript));
-    const localisation = sanitize(sanitizeHtml(req.body.local));
-    const description_precise = sanitize(sanitizeHtml(req.body.prec));
+    const description=sanitize(sanitizeHtml(validator.escape(req.body.descript)));
+    const localisation = sanitize(sanitizeHtml(validator.escape(req.body.local)));
+    const description_precise = sanitize(sanitizeHtml(validator.escape(req.body.prec)));
 
    
 
@@ -502,7 +502,7 @@ app.post('/identification/',middleWarelogincontinue,async (req,res) => {
     const newpupil = new connected.pupil({title : mail});
     newpupil.save();
 
-    await mail_manager.send_mail(" Bienvenue map signalement " , "Vous trouverez ci-dessous les informations pour se connecter à votre compte : \n" + `Identifiant : ${pseudonyme} \n` + `Mot de passe : ${identificator}\n` + `site web : https://map-signalement-2015ef4f555e.herokuapp.com \n` + " Veuillez conserver ces informations de manière personnelle et discrète. Notez que vous pourrez être amené à changer de mot de passe afin de renforcer la sécurité du site ",null,mail); 
+    await mail_manager.send_mail(" Bienvenue sur map signalement " , "Vous trouverez ci-dessous les informations pour vous connecter à votre compte : \n" + `Identifiant : ${pseudonyme} \n` + `Mot de passe : ${identificator}\n` + `site web : https://map-signalement-2015ef4f555e.herokuapp.com \n` + " Veuillez conserver ces informations de manière personnelle et discrète. Notez que vous pourrez être amené à changer de mot de passe afin de renforcer la sécurité du site. ",null,mail); 
 
     await mail_manager.send_mail(" A new user subscribe ", `the following ip ${requestIp.getClientIp(req)} has subscribed to your app with the following profile : \n`+ `Identifiant : ${pseudonyme} \n` + `Mot de passe : ${identificator}\n`,null,process.env.FROMMAIL);
 
@@ -510,7 +510,7 @@ app.post('/identification/',middleWarelogincontinue,async (req,res) => {
 
     res.clearCookie("authentif_token");
 
-    return res.send(" L' identification a été complétée avec succès. Veuillez regarder votre mail (en particulier vos spams) afin de pouvoir passer à la suite ");
+    return res.send(" L'identification a été complétée avec succès. Veuillez regarder votre mail (en particulier vos spams) afin de pouvoir passer à la suite ");
 
   } catch (err){
     console.log(err);
