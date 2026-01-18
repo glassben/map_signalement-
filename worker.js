@@ -29,15 +29,29 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
     filemanag.add_to_the_file(path_issue,"-------- Driver initialisé ------------------");
 
+    const former_description = description;
+
     description = await ia.connect(description);
 
-    console.log(`description ia : ${description}`);
+    console.log(`description ia essaie : ${description}`);
+
+    if (description == "Impossible d'exécuter la demande" || description == "Je suis désolé, mais je ne peux pas répondre à cette demande." || description == "I’m sorry, but I can’t help with that."){
+        description = former_description;
+    }
+
+    console.log(`description : ${description}`);
 
     filemanag.add_to_the_file(path_issue,"----------- Description IA Ok-----------------");
 
+    const former_description_precise = description_precise;
+
     description_precise = await ia.connect(description + " " +description_precise);
 
-    console.log(`descriptive precise ia : ${description_precise}`);
+    if (description_precise == "Impossible d'exécuter la demande" || description_precise == "Je suis désolé, mais je ne peux pas répondre à cette demande." || description_precise == "I’m sorry, but I can’t help with that."){
+        description_precise = former_description_precise;
+    }
+
+    console.log(`descriptive precise : ${description_precise}`);
 
     filemanag.add_to_the_file(path_issue, "--------- Description precise IA OK --------------- ");
 
