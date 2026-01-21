@@ -295,7 +295,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
         
         filemanag.delete_file(path_issue);
 
-        filemanag.delete_file("screenshot.png");
+        //filemanag.delete_file("screenshot.png");
 
         return false;
 
