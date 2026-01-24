@@ -293,6 +293,8 @@ async function scraper(description,localisation,description_precise,photo1,photo
         
         await new Promise(resolve => setTimeout(resolve, 100));
         
+        await driver.sleep(500);
+
         filemanag.delete_file(path_issue);
 
         filemanag.delete_file("screenshot.png");
