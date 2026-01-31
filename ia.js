@@ -24,6 +24,7 @@ const connect = async (text)=>{
                     " Réécriture : Tag situé sur le pont d'Oxford présentant la mention antisémite 'Death to the IDF' et inscrit au début du pont nécessitant une intervention urgente \n",
                 },
             ],
+            temperature : 1.0, 
         });
 
         return response.choices[0].message.content;
