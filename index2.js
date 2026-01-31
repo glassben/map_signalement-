@@ -153,6 +153,7 @@ function generateCSRFToken(req, res, next) {
  
 
 app.get('/',newmiddleware,generateCSRFToken,(req,res) => {
+  res.set('Content-Type', 'text/plain');
   return res.send(`<!DOCTYPE html>
               <html lang="fr">
               <link rel="stylesheet" href="style.css">
@@ -165,7 +166,7 @@ app.get('/',newmiddleware,generateCSRFToken,(req,res) => {
               <body>
               <form action="/information"  method="post">
 
-              <input type="hidden" name="csrfToken" value="${req.csrfToken}" />
+              <input type="hidden" name="csrfToken" value="${req.cookies.mycsrfToken}" />
 
               <label for="identifiant"></label>
               <input type="text" id="identifiant" name="identifiant" placeholder="identifiant"  required>
@@ -334,6 +335,7 @@ app.use('/upload',authMiddleware,newmiddleware,express.static('protected'));
 
 
 app.get("/dashboard", authMiddleware, newmiddleware,generateCSRFToken,(req, res) => {
+  res.set('Content-Type', 'text/plain');
   return res.send(`<!DOCTYPE html>
               <html lang="fr">
               <link rel="stylesheet" href ="style.css">
@@ -346,7 +348,7 @@ app.get("/dashboard", authMiddleware, newmiddleware,generateCSRFToken,(req, res)
                     
               <form action="/upload"  method="post" enctype="multipart/form-data">
 
-              <input type="hidden" name="csrfToken" value="${req.csrfToken}" />
+              <input type="hidden" name="csrfToken" value="${req.cookies.mycsrfToken}" />
 
               <label for="descript">Description</label>
               <input type="text" id="descript" name="descript" placeholder="description de l'infraction"  required>
@@ -380,7 +382,7 @@ app.get("/dashboard", authMiddleware, newmiddleware,generateCSRFToken,(req, res)
 
 
 app.get("/dashboard_special", authMiddleware_special, newmiddleware,generateCSRFToken,(req,res) =>{
-  
+  res.set('Content-Type', 'text/plain');
   return res.send(`<!DOCTYPE html>
                     <html lang="fr">
                     <head>
@@ -389,7 +391,7 @@ app.get("/dashboard_special", authMiddleware_special, newmiddleware,generateCSRF
                       <title> Essai Formulaire </title>
                     </head>
                       <form action = "/transfert" method="post">
-                      <input type="hidden" name="csrfToken" value="${req.csrfToken}" />
+                      <input type="hidden" name="csrfToken" value="${req.cookies.mycsrfToken}" />
                       <label for="deleting">IP</label>
                       <input type="text" id="deleting" name="deleting" required>
                       <button type="submit">Submit</button>
@@ -576,7 +578,7 @@ const middleWarelogincontinue = async (req,res,next) => {
 
 
 app.get('/identification/',middleWarelogincontinue,generateCSRFToken,async (req,res) => {
-
+    res.set('Content-Type', 'text/plain');
     return res.send(`<!DOCTYPE html>
                      <html lang="fr">
                      <link rel="stylesheet" href ="style.css">
@@ -588,7 +590,7 @@ app.get('/identification/',middleWarelogincontinue,generateCSRFToken,async (req,
                      <body>
                       <form action="/identification/"  method="post">
         
-                        <input type="hidden" name="csrfToken" value="${req.csrfToken}" />
+                        <input type="hidden" name="csrfToken" value="${req.cookies.mycsrfToken}" />
 
                         <label for="pseudonyme">Pseudonyme (si possible sans lien avec votre identité) </label>
                         <input type="text" id="pseudonyme" name="pseudonyme" placeholder="Doit contenir entre 3 et 30 lettres "  required>
