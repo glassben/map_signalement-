@@ -18,7 +18,7 @@ const filemanag = require("./filemanagement.js");
 const scraperQueue = require("./queue.js");
 const bouncer = require("express-bouncer")(500,90000);
 const validator = require('validator');
-
+const sanitize_filename = require("sanitize-filename");
 
 dotenv.config();
 
@@ -74,7 +74,8 @@ let storage = multer.diskStorage({
       cb(null, path.join(__dirname, 'tmp/') )
   },
   filename : function (req,file,cb){
-    cb(null,file.originalname)
+    const safeName = sanitize_filename(file.originalname);
+    cb(null,safeName)
   }
 });
 
