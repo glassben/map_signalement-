@@ -4,7 +4,7 @@
   "description": "Web App pour faciliter les signalement de Grenoble",
   "main": "index.js",
   "scripts": {
-    "start": "node index2.js"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
