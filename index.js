@@ -40,14 +40,14 @@ app.use(express.static('public'));
 app.disable('x-powered-by');
 
 
-
 const corsOptions = {
   origin:'https://map-signalement-2015ef4f555e.herokuapp.com/', 
   methods:'GET,POST',
   credential : true,
-}
+} 
 
-app.use(cors(corsOptions));
+
+//app.use(cors(corsOptions));
 
 
 //app.enable("trust proxy");
@@ -74,7 +74,7 @@ let storage = multer.diskStorage({
       cb(null, path.join(__dirname, 'tmp/') )
   },
   filename : function (req,file,cb){
-    cb(null,file.originalname)
+    cb(null,'44_' + file.originalname)
   }
 });
 
@@ -101,6 +101,7 @@ const newmiddleware = async (req,res,next)=>{
 }
 
 const initiatemiddleware = async (req,res,next)=>{
+  
   const userIp = requestIp.getClientIp(req);
   const count_associated = await connected.count_number_connexion_table.findOne({ip_ : userIp});
 
@@ -159,9 +160,11 @@ app.post('/information',bouncer.block,newmiddleware,initiatemiddleware,async (re
 
 
     const {error,value} = connected.Schema_validation.validate(req.body);
+
+    console.log(`Erreur validation schema : ${error}`);
     
     if (error) {
-      mail_manager.send_mail("Access denied", "the following ip try to access to the device without authorization : \n" +` ip : ${userIp}` + "\n" + `Date: ${new Date()}` + "\n" + `And failed due to the following reason : ${error.details[0].message} `,null,process.env.FROMMAIL);
+      mail_manager.send_mail("Access denied", "the following ip try to access to the device without authorization : \n" +` ip : ${userIp}` + "\n" + `Date: ${new Date()}` + "\n" + `And failed due to the following reason : ${error} `,null,process.env.FROMMAIL);
       return res.redirect("/");
     }
 
@@ -175,9 +178,12 @@ app.post('/information',bouncer.block,newmiddleware,initiatemiddleware,async (re
     mot_de_passe = sanitize(sanitizeHtml(mot_de_passe));
 
     const user = await connected.id_people.findOne({name_id : identifiant}).collation({ locale: 'en', strength: 3 });
+    
+    
     const userspecial = await connected.special_people.findOne({name_id : identifiant}).collation({ locale: 'en', strength: 3 });
 
-    
+    const comparison = await bcrypt.compare(mot_de_passe,user.code_id)
+
 
     if ((!user || !(await bcrypt.compare(mot_de_passe,user.code_id))) && !userspecial){
       mail_manager.send_mail("Access denied", "the following ip try to access to the device without authorization : \n" +` ip : ${userIp}` + "\n" + `Date: ${new Date()}`,null,process.env.FROMMAIL);
@@ -321,8 +327,6 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
 
     const username_ = String(req.user.username);
 
-    //console.log(`the user is ${username_}`);
-
     scraperQueue.scraperQueue.push({description,localisation,description_precise,path_image1,path_image2,path_image3,username_})
 
     return res.redirect("/dashboard");
@@ -392,7 +396,6 @@ const middleWarelogin = async (req,res,next) => {
 
       const token_ = sanitize(sanitizeHtml(req.params.token));
       
-      //console.log(`MiddleWarelogin and here is the token : ${token} \n`);
 
       const possibleregistration = await connected.registration.findOne({token:token_,Status:"unconnected",expireAt : {$gt: new Date()}});
 

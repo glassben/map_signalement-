@@ -15,7 +15,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
     const options = new chrome.Options();
 
     options.setChromeBinaryPath(process.env.CHROME_BIN);
-    options.addArguments('--headless');
+    //options.addArguments('--headless');
     options.addArguments("--disable-gpu");
     options.addArguments("--no-sandbox");
     options.addArguments('--disable-dev-shm-usage');
@@ -75,7 +75,10 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
         filemanag.add_to_the_file(path_issue,"------ Dysfonctionnement OK ----------")
 
-        let selection_adresse=driver.findElement(By.xpath("/html/body/div/main/div/div/div[2]/div/div/div/div[3]/form/div[8]/div[2]/label/input"));
+        //let selection_adresse=driver.findElement(By.xpath("/html/body/div/main/div/div/div[2]/div/div/div/div[3]/form/div[8]/div[2]/label/input"));
+        
+        let selection_adresse=driver.findElement(By.xpath("/html/body/div/main/div/div/div/div/div/div/div[3]/form/div[8]/div[2]/label/input"));
+        
         driver.executeScript("arguments[0].click();",selection_adresse);
 
         console.log(" demande de saisi manuel de l'adresse  OK ")
