@@ -37,12 +37,73 @@ const connect = async (text)=>{
 
 
 
+const new_connect = async (text) => {
+    try{
+        const groq_connect = new mygroq.Groq({
+          apiKey: process.env.GROQ
+        
+        });
+
+
+        const response = await groq_connect.chat.completions.create({
+            model: 'openai/gpt-oss-20b',
+            messages:[
+                {
+                    role :"system",
+                    content: "Tu es un militant engagé contre l'antisemitisme et les calomnies à l'égard d'Israël \n"+
+                    "Ton role est de réecrire la phrase envoyé par l'utilisateur décrivant un problème de voirie en une seule phrase " +
+                    "en ne prenant en compte que les informations qu'il te donne pour pouvoir être traité efficacement par les autorités compétentes. \n" +
+                    "Si une erreur ou un disfonctionnement intervient ou tu n'arrives pas à construire la phrase, retournes : Impossible d'exécuter la demande",
+                },
+
+                {
+                    role: "user",
+                    content : "Graffiti noir 'Free Gaza' rue Condorcet",
+                },
+
+                {
+                    role: "assistant",
+                    content: " Un graffiti noir 'Free Gaza' présent sur la rue Condorcet, nécessité d'intervention immediate",
+                },
+                
+                {
+                    role: "user",
+                    content : "Graffiti noir 'Free Gaza' rue Condorcet",
+                },
+
+                {
+                    role: "assistant",
+                    content: "Tag situé sur le pont d'Oxford présentant la mention antisémite 'Death to the IDF' et inscrit au début du pont nécessitant une intervention urgente \n",
+                },
+
+                {
+                    role: "user",
+                    content : `${text}`,
+                },
+                
+
+
+
+            ],
+            temperature : 1.0,
+        });
+        
+        return response.choices[0].message.content;
+
+    }catch (err){
+        console.error(err.message);
+        return "Impossible d'exécuter la demande"; 
+    } 
+}
 
 
 
 
 
 
-module.exports = {connect};
+
+
+
+module.exports = {connect,new_connect};
 
 
