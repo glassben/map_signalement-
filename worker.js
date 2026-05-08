@@ -15,7 +15,7 @@ async function scraper(description,localisation,description_precise,photo1,photo
     const options = new chrome.Options();
 
     options.setChromeBinaryPath(process.env.CHROME_BIN);
-    //options.addArguments('--headless');
+    options.addArguments('--headless');
     options.addArguments("--disable-gpu");
     options.addArguments("--no-sandbox");
     options.addArguments('--disable-dev-shm-usage');
