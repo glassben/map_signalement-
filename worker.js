@@ -118,7 +118,9 @@ async function scraper(description,localisation,description_precise,photo1,photo
 
         filemanag.add_to_the_file(path_issue,"---------Completion OK -----------------");
 
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        await driver.sleep(500);
 
         let selection = await driver.findElement(By.xpath("//ul[@id='select2-form_f151-results']/li"));
         
