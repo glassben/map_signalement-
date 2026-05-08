@@ -157,32 +157,33 @@ function generateCSRFToken(req, res, next) {
 
 app.get('/',newmiddleware,generateCSRFToken,(req,res) => {
   res.set('Content-Type', 'text/plain');
-  return res.send(`<!DOCTYPE html>
-              <html lang="fr">
-              <link rel="stylesheet" href="style.css">
-              <script type= "text/javascript" src = "Clear.js" defer></script>
-              <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title> Identifiant </title>
-              </head>
-              <body>
-              <form action="/information"  method="post">
+  return res.send(`
+    <!DOCTYPE html>
+    <html lang="fr">
+    <link rel="stylesheet" href="style.css">
+    <script type= "text/javascript" src = "Clear.js" defer></script>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Identifiant </title>
+    </head>
+    <body>
+    <form action="/information"  method="post">
 
-              <input type="hidden" name="csrfToken" value="${req.cookies.mycsrfToken}" />
+    <input type="hidden" name="csrfToken" value="${req.cookies.mycsrfToken}" />
 
-              <label for="identifiant"></label>
-              <input type="text" id="identifiant" name="identifiant" placeholder="identifiant"  required>
+    <label for="identifiant"></label>
+    <input type="text" id="identifiant" name="identifiant" placeholder="identifiant"  required>
             
-              <label for="mot de passe"></label>
-              <input type="password" id="mot_de_passe" name="mot_de_passe" placeholder="mot de passe" required>
+    <label for="mot de passe"></label>
+    <input type="password" id="mot_de_passe" name="mot_de_passe" placeholder="mot de passe" required>
             
-              <button type="submit">Submit</button>
+    <button type="submit">Submit</button>
 
-              </form>
-              <input type="checkbox" id="toggleBtn">Code en claire
-              </body>
-              </html>`);
+    </form>
+    <input type="checkbox" id="toggleBtn">Code en claire
+    </body>
+    </html>`);
 });
 
 
@@ -221,6 +222,8 @@ app.post('/information',bouncer.block,newmiddleware,initiatemiddleware,validateC
 
 
     let {identifiant,mot_de_passe} =  value;
+
+    console.log(`${identifiant}  ${mot_de_passe}`);
 
     identifiant.replace(" ","").replace("<","").replace(">","");
 
@@ -339,7 +342,8 @@ app.use('/upload',authMiddleware,newmiddleware,express.static('protected'));
 
 app.get("/dashboard", authMiddleware, newmiddleware,generateCSRFToken,(req, res) => {
   res.set('Content-Type', 'text/plain');
-  return res.send(`<!DOCTYPE html>
+  return res.send(`
+              <!DOCTYPE html>
               <html lang="fr">
               <link rel="stylesheet" href ="style.css">
               <head>
@@ -386,7 +390,8 @@ app.get("/dashboard", authMiddleware, newmiddleware,generateCSRFToken,(req, res)
 
 app.get("/dashboard_special", authMiddleware_special, newmiddleware,generateCSRFToken,(req,res) =>{
   res.set('Content-Type', 'text/plain');
-  return res.send(`<!DOCTYPE html>
+  return res.send(`
+                    <!DOCTYPE html>
                     <html lang="fr">
                     <head>
                       <meta charset="UTF-8">
