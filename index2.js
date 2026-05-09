@@ -76,7 +76,7 @@ let storage = multer.diskStorage({
   },
   filename : function (req,file,cb){
     const safeName = sanitize_filename(file.originalname);
-    cb(null,safeName)
+    cb(null,'44_'+safeName)
   }
 });
 
@@ -156,7 +156,7 @@ function generateCSRFToken(req, res, next) {
  
 
 app.get('/',newmiddleware,generateCSRFToken,(req,res) => {
-  res.set('Content-Type', 'text/plain');
+  //res.set('Content-Type', 'text/plain');
   return res.send(`
     <!DOCTYPE html>
     <html lang="fr">
@@ -183,7 +183,8 @@ app.get('/',newmiddleware,generateCSRFToken,(req,res) => {
     </form>
     <input type="checkbox" id="toggleBtn">Code en claire
     </body>
-    </html>`);
+    </html>`
+  );
 });
 
 
@@ -341,7 +342,7 @@ app.use('/upload',authMiddleware,newmiddleware,express.static('protected'));
 
 
 app.get("/dashboard", authMiddleware, newmiddleware,generateCSRFToken,(req, res) => {
-  res.set('Content-Type', 'text/plain');
+  //res.set('Content-Type', 'text/plain');
   return res.send(`
               <!DOCTYPE html>
               <html lang="fr">
@@ -384,12 +385,13 @@ app.get("/dashboard", authMiddleware, newmiddleware,generateCSRFToken,(req, res)
               </form>
 
               </body>
-              </html>`);
+              </html>`
+            );
         });
 
 
 app.get("/dashboard_special", authMiddleware_special, newmiddleware,generateCSRFToken,(req,res) =>{
-  res.set('Content-Type', 'text/plain');
+  //res.set('Content-Type', 'text/plain');
   return res.send(`
                     <!DOCTYPE html>
                     <html lang="fr">
@@ -586,7 +588,7 @@ const middleWarelogincontinue = async (req,res,next) => {
 
 
 app.get('/identification/',middleWarelogincontinue,generateCSRFToken,async (req,res) => {
-    res.set('Content-Type', 'text/plain');
+    //res.set('Content-Type', 'text/plain');
     return res.send(`<!DOCTYPE html>
                      <html lang="fr">
                      <link rel="stylesheet" href ="style.css">
@@ -615,7 +617,8 @@ app.get('/identification/',middleWarelogincontinue,generateCSRFToken,async (req,
                       </form>
 
                      </body>
-                     </html>`);    
+                     </html>`
+                    );    
 });
 
 
