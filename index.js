@@ -323,7 +323,7 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
 
     console.log(`description originale : ${description} \n`);
     
-    console.log(`path image : ${path_image1} \n`);
+    //console.log(`path image : ${path_image1} \n`);
 
     const username_ = String(req.user.username);
 
@@ -526,7 +526,7 @@ app.post('/identification/',middleWarelogincontinue,async (req,res) => {
 
 const PORT = process.env.PORT || 3000;
 
-console.log(PORT);
+//console.log(PORT);
 
 
 app.listen(PORT,()=>{
