@@ -138,13 +138,17 @@ function generateCSRFToken(req, res, next) {
     maxAge: 30*60*1000,
   });
   req.csrfToken = csrfToken;
-  console.log(req.csrfToken)
+  console.log(req.csrfToken);
   return next();
  }
 
 
  async function validateCSRFToken(req, res, next) {
   const csrfToken = req.cookies.mycsrfToken;
+  console.log(`CSRF cookie : ${csrfToken}`);
+  console.log(`CSRF body : ${req.body?.csrfToken}`);
+  console.log(`CSRF body sanitized : ${sanitize(sanitizeHtml(validator.escape(req.body?.csrfToken)))}`)
+  console.log(`Verification : ${sanitize(sanitizeHtml(validator.escape(req.body?.csrfToken))) === csrfToken}`)
   const userIp = requestIp.getClientIp(req);
   if (sanitize(sanitizeHtml(validator.escape(req.body?.csrfToken))) === csrfToken) {
     return next();
@@ -170,7 +174,7 @@ app.get('/',newmiddleware,generateCSRFToken,(req,res) => {
     <body>
     <form action="/information"  method="post">
 
-    <input type="hidden" name="csrfToken" value="${req.cookies.mycsrfToken}" />
+    <input type="hidden" name="csrfToken" value=${req.csrfToken} />
 
     <label for="identifiant"></label>
     <input type="text" id="identifiant" name="identifiant" placeholder="identifiant"  required>
@@ -238,7 +242,7 @@ app.post('/information',bouncer.block,newmiddleware,initiatemiddleware,validateC
     
 
     if ((!user || !(await bcrypt.compare(mot_de_passe,user.code_id))) && !userspecial){
-      //mail_manager.send_mail("Access denied", "the following ip try to access to the device without authorization : \n" +` ip : ${userIp}` + "\n" + `Date: ${new Date()}`,null,process.env.FROMMAIL);
+      mail_manager.send_mail("Access denied", "the following ip try to access to the device without authorization : \n" +` ip : ${userIp}` + "\n" + `Date: ${new Date()}`,null,process.env.FROMMAIL);
       return res.redirect("/");
     }
 
@@ -356,7 +360,7 @@ app.get("/dashboard", authMiddleware, newmiddleware,generateCSRFToken,(req, res)
                     
               <form action="/upload"  method="post" enctype="multipart/form-data">
 
-              <input type="hidden" name="csrfToken" value="${req.cookies.mycsrfToken}" />
+              <input type="hidden" name="csrfToken" value="${req.csrfToken}" />
 
               <label for="descript">Description</label>
               <input type="text" id="descript" name="descript" placeholder="description de l'infraction"  required>
@@ -401,7 +405,7 @@ app.get("/dashboard_special", authMiddleware_special, newmiddleware,generateCSRF
                       <title> Essai Formulaire </title>
                     </head>
                       <form action = "/transfert" method="post">
-                      <input type="hidden" name="csrfToken" value="${req.cookies.mycsrfToken}" />
+                      <input type="hidden" name="csrfToken" value="${req.csrfToken}" />
                       <label for="deleting">IP</label>
                       <input type="text" id="deleting" name="deleting" required>
                       <button type="submit">Submit</button>
@@ -600,7 +604,7 @@ app.get('/identification/',middleWarelogincontinue,generateCSRFToken,async (req,
                      <body>
                       <form action="/identification/"  method="post">
         
-                        <input type="hidden" name="csrfToken" value="${req.cookies.mycsrfToken}" />
+                        <input type="hidden" name="csrfToken" value="${req.csrfToken}" />
 
                         <label for="pseudonyme">Pseudonyme (si possible sans lien avec votre identité) </label>
                         <input type="text" id="pseudonyme" name="pseudonyme" placeholder="Doit contenir entre 3 et 30 lettres "  required>
