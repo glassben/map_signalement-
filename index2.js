@@ -75,9 +75,12 @@ let storage = multer.diskStorage({
       cb(null, path.join(__dirname, 'tmp/') )
   },
   filename : function (req,file,cb){
-    const baseName = path.basename(file.originalname);
-    const safeName = sanitize_filename(baseName);
-    cb(null,'44_'+safeName)
+
+    const randomName = crypto.randomBytes(16).toString('hex');
+
+    const extension = path.extname(file.originalname);
+ 
+    cb(null,`44_${randomName}${extension}`)
   }
 });
 
@@ -446,13 +449,19 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
    
     
 
-    let path_image1= req.files["image1"]?.[0];
-    let path_image2= req.files["image2"]?.[0];
-    let path_image3= req.files["image3"]?.[0];
+    let path_image1= req.files["image1"]?.[0].path;
+    let path_image2= req.files["image2"]?.[0].path;
+    let path_image3= req.files["image3"]?.[0].path;
 
-    path_image1 = filemanag.SafeFilePath(path_image1);
-    path_image2 = filemanag.SafeFilePath(path_image2);
-    path_image3 = filemanag.SafeFilePath(path_image3);
+    console.log(path_image1);
+    console.log(path_image2);
+    console.log(path_image3);
+
+
+
+    //path_image1 = path_image1.path;
+    //path_image2 = path_image2.path;
+    //path_image3 = path_image3.path;
 
     //console.log(`description originale : ${description} \n`);
     
