@@ -75,7 +75,8 @@ let storage = multer.diskStorage({
       cb(null, path.join(__dirname, 'tmp/') )
   },
   filename : function (req,file,cb){
-    const safeName = sanitize_filename(file.originalname);
+    const baseName = path.basename(file.originalname);
+    const safeName = sanitize_filename(baseName);
     cb(null,'44_'+safeName)
   }
 });
@@ -145,10 +146,10 @@ function generateCSRFToken(req, res, next) {
 
  async function validateCSRFToken(req, res, next) {
   const csrfToken = req.cookies.mycsrfToken;
-  console.log(`CSRF cookie : ${csrfToken}`);
-  console.log(`CSRF body : ${req.body?.csrfToken}`);
-  console.log(`CSRF body sanitized : ${sanitize(sanitizeHtml(validator.escape(req.body?.csrfToken)))}`)
-  console.log(`Verification : ${sanitize(sanitizeHtml(validator.escape(req.body?.csrfToken))) === csrfToken}`)
+  //console.log(`CSRF cookie : ${csrfToken}`);
+  //console.log(`CSRF body : ${req.body?.csrfToken}`);
+  //console.log(`CSRF body sanitized : ${sanitize(sanitizeHtml(validator.escape(req.body?.csrfToken)))}`)
+  //console.log(`Verification : ${sanitize(sanitizeHtml(validator.escape(req.body?.csrfToken))) === csrfToken}`)
   const userIp = requestIp.getClientIp(req);
   if (sanitize(sanitizeHtml(validator.escape(req.body?.csrfToken))) === csrfToken) {
     return next();
@@ -228,7 +229,7 @@ app.post('/information',bouncer.block,newmiddleware,initiatemiddleware,validateC
 
     let {identifiant,mot_de_passe} =  value;
 
-    console.log(`${identifiant}  ${mot_de_passe}`);
+    //console.log(`${identifiant}  ${mot_de_passe}`);
 
     identifiant.replace(" ","").replace("<","").replace(">","");
 
@@ -452,9 +453,9 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
     path_image2 = filemanag.SafeFilePath(path_image2);
     path_image3 = filemanag.SafeFilePath(path_image3);
 
-    console.log(`description originale : ${description} \n`);
+    //console.log(`description originale : ${description} \n`);
     
-    console.log(`path image : ${path_image1} \n`);
+    //console.log(`path image : ${path_image1} \n`);
 
     const username_ = String(req.user.username);
 

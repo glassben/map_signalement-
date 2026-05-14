@@ -41,7 +41,9 @@ function SafeFilePath(file){
     }
     const UPLOAD_DIR = path.join(__dirname, 'tmp/');
 
-    let fullpath = path.resolve(UPLOAD_DIR,file.originalname);
+    const baseName = path.basename(file.originalname)
+
+    let fullpath = path.resolve(UPLOAD_DIR,'44_'+baseName);
 
     if (!fullpath.startsWith(UPLOAD_DIR)){
         throw new Error("invalid file path");
