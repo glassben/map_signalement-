@@ -444,6 +444,7 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
     const description_precise = sanitize(sanitizeHtml(validator.escape(req.body.prec)));
 
    
+    
 
     let path_image1= req.files["image1"]?.[0];
     let path_image2= req.files["image2"]?.[0];
