@@ -75,6 +75,7 @@ function checkFileType(file,cb){
 
 
   if (ALLOWED_MIME_TO_EXT[file.mimetype]){
+    file.safeExtension = ext;
     return cb(null,true);
   } else{
     cb('Erreur : Seules les images du format (jpeg,jpg,png) sont authorisées !')
