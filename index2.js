@@ -73,8 +73,9 @@ function checkFileType(file,cb){
 
   //const isMimeValid = allowedMimes.includes(file.mimetype);
 
+  const ext = ALLOWED_MIME_TO_EXT[file.mimetype];
 
-  if (ALLOWED_MIME_TO_EXT[file.mimetype]){
+  if (ext){
     file.safeExtension = ext;
     return cb(null,true);
   } else{
@@ -91,7 +92,7 @@ let storage = multer.diskStorage({
 
     const randomName = crypto.randomBytes(16).toString('hex');
 
-    const extension = ALLOWED_MIME_TO_EXT[file.mimetype] ?? 'bin';
+    const extension = file.safeExtension ?? 'bin';
  
     cb(null,`44_${randomName}.${extension}`)
   }
