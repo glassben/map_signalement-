@@ -57,18 +57,24 @@ app.use(cors(corsOptions));
 
 //app.enable("trust proxy");
 
+const ALLOWED_MIME_TO_EXT = {
+  'image/jpeg': 'jpg',
+  'image/jpg':  'jpg',
+  'image/png':  'png',
+};
+
 
 function checkFileType(file,cb){
   //const filetypes=/jpeg|jpg|png/;
   //const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
   //const mimetype = filetypes.test(file.mimetype);
 
-  const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png'];
+  //const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png'];
 
-  const isMimeValid = allowedMimes.includes(file.mimetype);
+  //const isMimeValid = allowedMimes.includes(file.mimetype);
 
 
-  if (isMimeValid){
+  if (ALLOWED_MIME_TO_EXT[file.mimetype]){
     return cb(null,true);
   } else{
     cb('Erreur : Seules les images du format (jpeg,jpg,png) sont authorisées !')
@@ -84,7 +90,7 @@ let storage = multer.diskStorage({
 
     const randomName = crypto.randomBytes(16).toString('hex');
 
-    const extension = mime.extension(file.mimetype);
+    const extension = ALLOWED_MIME_TO_EXT[file.mimetype] ?? 'bin';
  
     cb(null,`44_${randomName}.${extension}`)
   }
@@ -459,9 +465,9 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
     let path_image2= req.files["image2"]?.[0].path;
     let path_image3= req.files["image3"]?.[0].path;
 
-    console.log(path_image1);
-    console.log(path_image2);
-    console.log(path_image3);
+    //console.log(path_image1);
+    //console.log(path_image2);
+    //console.log(path_image3);
 
 
 
@@ -705,7 +711,7 @@ app.post('/identification/',middleWarelogincontinue,validateCSRFToken,async (req
 
 const PORT = process.env.PORT || 3000;
 
-console.log(PORT);
+//console.log(PORT);
 
 
 app.listen(PORT,()=>{
