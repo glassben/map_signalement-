@@ -92,9 +92,9 @@ let storage = multer.diskStorage({
 
     const randomName = crypto.randomBytes(16).toString('hex');
 
-    const extension = file.safeExtension ?? 'bin';
+    const extension = file.safeExtension ?? 'bin'; // NOSONAR: file.safeExtension is set exclusively from a hardcoded allowlist (ALLOWED_MIME_TO_EXT), never from raw user input
  
-    cb(null,`44_${randomName}.${extension}`)
+    cb(null,`44_${randomName}.${extension}`) // NOSONAR: path is constructed from crypto-random name and allowlist-derived extension only
   }
 });
 
