@@ -147,15 +147,15 @@ function generateCSRFToken(req, res, next) {
     sameSite:"strict",
     maxAge: 30*60*1000,
   });
-  req.csrfToken = csrfToken;
-  console.log(req.csrfToken);
+  req.session.csrfToken = csrfToken;
+  //console.log(req.csrfToken);
   return next();
  }
 
 
  async function validateCSRFToken(req, res, next) {
-  const csrfToken = req.cookies.mycsrfToken;
-    const userIp = requestIp.getClientIp(req);
+  const csrfToken = req.session.csrfToken;
+  const userIp = requestIp.getClientIp(req);
   if (sanitize(sanitizeHtml(validator.escape(req.body?.csrfToken))) === csrfToken) {
     return next();
   } else {
@@ -233,8 +233,6 @@ app.post('/information',bouncer.block,newmiddleware,initiatemiddleware,validateC
 
 
     let {identifiant,mot_de_passe} =  value;
-
-    //console.log(`${identifiant}  ${mot_de_passe}`);
 
     identifiant.replace(" ","").replace("<","").replace(">","");
 
