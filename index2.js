@@ -64,14 +64,7 @@ const ALLOWED_MIME_TO_EXT = {
 
 
 function checkFileType(file,cb){
-  //const filetypes=/jpeg|jpg|png/;
-  //const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  //const mimetype = filetypes.test(file.mimetype);
-
-  //const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png'];
-
-  //const isMimeValid = allowedMimes.includes(file.mimetype);
-
+  
   const ext = ALLOWED_MIME_TO_EXT[file.mimetype];
 
   if (ext){
@@ -162,11 +155,7 @@ function generateCSRFToken(req, res, next) {
 
  async function validateCSRFToken(req, res, next) {
   const csrfToken = req.cookies.mycsrfToken;
-  //console.log(`CSRF cookie : ${csrfToken}`);
-  //console.log(`CSRF body : ${req.body?.csrfToken}`);
-  //console.log(`CSRF body sanitized : ${sanitize(sanitizeHtml(validator.escape(req.body?.csrfToken)))}`)
-  //console.log(`Verification : ${sanitize(sanitizeHtml(validator.escape(req.body?.csrfToken))) === csrfToken}`)
-  const userIp = requestIp.getClientIp(req);
+    const userIp = requestIp.getClientIp(req);
   if (sanitize(sanitizeHtml(validator.escape(req.body?.csrfToken))) === csrfToken) {
     return next();
   } else {
@@ -363,7 +352,6 @@ app.use('/upload',authMiddleware,newmiddleware,express.static('protected'));
 
 
 app.get("/dashboard", authMiddleware, newmiddleware,generateCSRFToken,(req, res) => {
-  //res.set('Content-Type', 'text/plain');
   return res.send(`
               <!DOCTYPE html>
               <html lang="fr">
@@ -412,7 +400,6 @@ app.get("/dashboard", authMiddleware, newmiddleware,generateCSRFToken,(req, res)
 
 
 app.get("/dashboard_special", authMiddleware_special, newmiddleware,generateCSRFToken,(req,res) =>{
-  //res.set('Content-Type', 'text/plain');
   return res.send(`
                     <!DOCTYPE html>
                     <html lang="fr">
@@ -466,23 +453,8 @@ app.post('/upload', authMiddleware, newmiddleware,upload.fields([
     let path_image2= req.files["image2"]?.[0].path;
     let path_image3= req.files["image3"]?.[0].path;
 
-    //console.log(path_image1);
-    //console.log(path_image2);
-    //console.log(path_image3);
-
-
-
-    //path_image1 = path_image1.path;
-    //path_image2 = path_image2.path;
-    //path_image3 = path_image3.path;
-
-    //console.log(`description originale : ${description} \n`);
-    
-    //console.log(`path image : ${path_image1} \n`);
 
     const username_ = String(req.user.username);
-
-    //console.log(`the user is ${username_}`);
 
     scraperQueue.scraperQueue.push({description,localisation,description_precise,path_image1,path_image2,path_image3,username_})
 
@@ -552,8 +524,6 @@ const middleWarelogin = async (req,res,next) => {
     try {
 
       const token_ = sanitize(sanitizeHtml(req.params.token));
-      
-      //console.log(`MiddleWarelogin and here is the token : ${token} \n`);
 
       const possibleregistration = await connected.registration.findOne({token:token_,Status:"unconnected",expireAt : {$gt: new Date()}});
 
@@ -595,8 +565,6 @@ const middleWarelogincontinue = async (req,res,next) => {
   try {
     const token_ = sanitize(sanitizeHtml(req.cookies.authentif_token));
 
-    //console.log(`MiddleWareLoginContinue and here is the token : ${token} \n`);
-    
     const possibleregistration = await connected.registration.findOne({token:token_,Status:"connected",expireAt : {$gt: new Date()}});
 
     if (!possibleregistration || possibleregistration.attempt >=4){
@@ -616,7 +584,6 @@ const middleWarelogincontinue = async (req,res,next) => {
 
 
 app.get('/identification/',middleWarelogincontinue,generateCSRFToken,async (req,res) => {
-    //res.set('Content-Type', 'text/plain');
     return res.send(`<!DOCTYPE html>
                      <html lang="fr">
                      <link rel="stylesheet" href ="style.css">
@@ -712,7 +679,7 @@ app.post('/identification/',middleWarelogincontinue,validateCSRFToken,async (req
 
 const PORT = process.env.PORT || 3000;
 
-//console.log(PORT);
+
 
 
 app.listen(PORT,()=>{
