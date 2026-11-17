@@ -27,7 +27,7 @@ It manipulates different frameworks such as Node.js, Selenium API to automatical
 
 * All files try to implement the basic protection to garantee a secure connection for the user and the system itself.
 
-*Specifically, we make sure to protect our system against CSRF attack, script injection, authentification, encrypted personal information, separation of priviledge.
+* Specifically, we make sure to protect our system against CSRF attack, script injection, authentification, encrypted personal information, separation of priviledge.
 
 * We audit our system protection with : snyk and sonarcloud.
 
