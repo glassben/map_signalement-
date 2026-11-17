@@ -23,7 +23,7 @@ It manipulates different frameworks such as Node.js, Selenium API to automatical
 
 * change_proxy.js : change the ip of the server at each request (not implemented in the final version).
 
-# * Security 
+# Security 
 
 * All files try to implement the basic protection to garantee a secure connection for the user and the system itself.
 
